@@ -3,22 +3,25 @@ const canvas = document.getElementById('mesa');
 /** @type {CanvasRenderingContext2D} */
 const ctx = canvas.getContext('2d');
 
-var canvasAncho = window.innerWidth-100;
-var canvasAlto = window.innerHeight-100;
+var canvasAncho = window.innerWidth-window.innerWidth/14;
+var canvasAlto = window.innerHeight-window.innerHeight/14;
 
 ctx.canvas.width  = canvasAncho;
 ctx.canvas.height = canvasAlto;
 
-const FPS = 120;
+const FPS = 140;
+var moverBarra1Arriba = false, moverBarra1Abajo = false, moverBarra2Arriba = false, moverBarra2Abajo = false;
 var distanciaBarras = 40, velocidadBarras = 8;
+var largoBarrasDefault = canvasAlto/5;
 var puntajeBarra1 = 0, puntajeBarra2 = 0, meta = 5;
 var nombreJugador1 = "Jugador 1", nombreJugador2 = "Jugador 2";
-var update;
+var update, empezoJuego = false;
+var touchX = [], touchY = [];
 
 var barra1 = {
     x: distanciaBarras,
     y: canvasAlto/2,
-    largo: 120,
+    largo: largoBarrasDefault,
     ancho: 20,
     color: "white",
     velocidad: velocidadBarras
@@ -27,7 +30,7 @@ var barra1 = {
 var barra2 = {
     x: canvasAncho - distanciaBarras,
     y: canvasAlto/2,
-    largo: 120,
+    largo: largoBarrasDefault,
     ancho: 20,
     color: "white",
     velocidad: velocidadBarras
@@ -38,11 +41,15 @@ var pelota = {
     y: canvasAlto/2,
     color: "white",
     radio : 15,
-    velocidad: 5,
+    velocidad: 7,
     direccion: {
         x: "derecha",
         y: "arriba"
     }
+};
+
+var puntaje = {
+    tamaño: "25px"
 };
 
 var botonEmpezar = {
@@ -55,7 +62,23 @@ var botonEmpezar = {
     largo: 110
 };
 
-var moverBarra1Arriba = false, moverBarra1Abajo = false, moverBarra2Arriba = false, moverBarra2Abajo = false;
+if(window.innerWidth > 1200 && window.innerHeight > 500){
+    puntaje.tamaño = "50px";
+    largoBarrasDefault = canvasAlto/6;
+} else {
+    puntaje.tamaño = "30px";
+    pelota.velocidad = 4;
+    pelota.radio = pelota.radio/2;
+    canvasAncho = window.innerWidth - window.innerWidth/14;
+    canvasAlto = window.innerHeight;
+    ctx.canvas.width  = canvasAncho;
+    ctx.canvas.height = canvasAlto;
+    barra1.velocidad = velocidadBarras/2;
+    barra2.velocidad = velocidadBarras/2;
+    barra1.ancho = barra1.ancho/2;
+    barra2.ancho = barra2.ancho/2;
+    
+}
 
 canvas.addEventListener("mousedown", clicPantalla);
 canvas.addEventListener("mousemove", movimientoMouse);
@@ -88,7 +111,54 @@ document.onkeyup = function(evento){
     } else if(evento.key == "ArrowDown"){
         moverBarra2Abajo = false;
     }
-}
+};
+
+window.ontouchstart = window.ontouchmove = (event) => {
+    for(let i = 0; i < 4; i++){
+        touchX[i] = event.touches[i].clientX;
+        touchY[i] = event.touches[i].clientY;
+        
+        if(empezoJuego){
+            if(touchX[i] < canvasAncho/2){
+                if(touchY[i] < canvasAlto/2){
+                    moverBarra1Arriba = true;
+                    moverBarra1Abajo = false;
+                } else {
+                    moverBarra1Arriba = false;
+                    moverBarra1Abajo = true;
+                }
+            } else{
+                if(touchY[i] < canvasAlto/2){
+                    moverBarra2Arriba = true;
+                    moverBarra2Abajo = false;
+                } else {
+                    moverBarra2Arriba = false;
+                    moverBarra2Abajo = true;
+                }
+            }
+        }
+    }
+};
+
+// window.ontouchend = (event) => {
+//     for(let i = 0; i < 4; i++){
+//         if(empezoJuego){
+//             if(touchX[i] < canvasAncho/2){
+//                 if(touchY[i] < canvasAlto/2){
+//                     moverBarra1Arriba = false;
+//                 } else {
+//                     moverBarra1Abajo = false;
+//                 }
+//             } else{
+//                 if(touchY[i] < canvasAlto/2){
+//                     moverBarra2Arriba = false;
+//                 } else {
+//                     moverBarra2Abajo = false;
+//                 }
+//             }
+//         }
+//     }
+// };
 
 function inicio(){
     // Bordes
@@ -128,7 +198,7 @@ function inicio(){
 function bucle(){
     actualizarPantalla();
     // Puntaje
-    ctx.font = "50px ArcadeClassic";
+    ctx.font = puntaje.tamaño+" ArcadeClassic";
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.fillText(puntajeBarra1+" - "+puntajeBarra2, canvasAncho/2, canvasAlto/7);
@@ -142,6 +212,12 @@ function bucle(){
     // Pelota
     ctx.fillStyle = pelota.color;
     ctx.fillRect(pelota.x - pelota.radio/2, pelota.y - pelota.radio/2, pelota.radio, pelota.radio);
+    
+    ctx.font = "10px Arial";
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.fillText(touchX[1]+" - "+touchY[1], canvasAncho/2, canvasAlto - canvasAlto/7);
+
     ctx.closePath();
 
     switch (pelota.direccion.x) {
@@ -162,29 +238,41 @@ function bucle(){
             break;
     }
 
-    // ----- Detecta la pelota en los bordes o en las barras -----
-    if(pelota.y + pelota.radio + 2 >= canvasAlto){
+    // ----- Detecta la pelota en los bordes -----
+    if(pelota.y + pelota.radio/2 >= canvasAlto){
         pelota.direccion.y = "arriba";
     }
 
-    if(pelota.y - pelota.radio - 2 <= 0){
+    if(pelota.y - pelota.radio/2 <= 0){
         pelota.direccion.y = "abajo";
     }
-
-    if((pelota.x + pelota.radio*2 >= barra2.x)
-        && (pelota.y + pelota.radio > barra2.y - barra2.largo/2 && pelota.y - pelota.radio < barra2.y + barra2.largo/2)){
+    // ----- Detecta la pelota en en las barras o en los bordes de los costados -----
+    if((pelota.x + pelota.radio/2 >= barra2.x - barra2.ancho && pelota.x + pelota.radio/2 < barra2.x - barra2.ancho/2)
+        && ((pelota.y - pelota.radio/2 > barra2.y - barra2.largo/2 && pelota.y - pelota.radio/2 < barra2.y + barra2.largo/2)
+        || (pelota.y + pelota.radio/2 > barra2.y - barra2.largo/2 && pelota.y - pelota.radio/2 < barra2.y + barra2.largo/2))){
         pelota.direccion.x = "izquierda";
-    } else if(pelota.x + pelota.radio + 2 >= canvasAncho){
-        pelota.x = barra1.x + pelota.radio*2;
+        // if(pelota.y < barra2.y){
+        //     pelota.direccion.y = "arriba";
+        // } else {
+        //     pelota.direccion.y = "abajo";
+        // }
+    } else if(pelota.x + pelota.radio/2 >= canvasAncho){
+        pelota.x = barra1.x + barra1.ancho + pelota.radio/2;
         pelota.y = barra1.y;
         puntajeBarra1++;
     }
 
-    if((pelota.x <= barra1.x + barra1.ancho)
-        && (pelota.y + pelota.radio > barra1.y - barra1.largo/2 && pelota.y - pelota.radio < barra1.y + barra1.largo/2)){
+    if((pelota.x - pelota.radio/2 <= barra1.x + barra1.ancho && pelota.x - pelota.radio/2 > barra1.x + barra1.ancho/2)
+        && ((pelota.y - pelota.radio/2 > barra1.y - barra1.largo/2 && pelota.y - pelota.radio/2 < barra1.y + barra1.largo/2)
+        || (pelota.y + pelota.radio/2 > barra1.y - barra1.largo/2 && pelota.y - pelota.radio/2 < barra1.y + barra1.largo/2))){
         pelota.direccion.x = "derecha";
-    } else if(pelota.x - pelota.radio - 2 <= 0){
-        pelota.x = barra2.x - pelota.radio*2;
+        // if(pelota.y < barra1.y){
+        //     pelota.direccion.y = "arriba";
+        // } else {
+        //     pelota.direccion.y = "abajo";
+        // }
+    } else if(pelota.x - pelota.radio/2 <= 0){
+        pelota.x = barra2.x - barra2.ancho - pelota.radio/2;
         pelota.y = barra2.y;
         puntajeBarra2++;
     }
@@ -217,6 +305,8 @@ function bucle(){
         }
     }
 
+    empezoJuego = true;
+
     if(puntajeBarra1 == meta){
         detenerJuego(nombreJugador1);
     } else if(puntajeBarra2 == meta){
@@ -227,19 +317,20 @@ function bucle(){
 
 function detenerJuego(ganador){
     clearInterval(update);
+    empezoJuego = false;
     actualizarPantalla();
     // Puntaje
-    ctx.font = "50px ArcadeClassic";
+    ctx.font = puntaje.tamaño+" ArcadeClassic";
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.fillText(puntajeBarra1+" - "+puntajeBarra2, canvasAncho/2, canvasAlto/7);
     // Barra 1
     ctx.beginPath();
     ctx.fillStyle = barra1.color;
-    ctx.fillRect(barra1.x, barra1.y - barra1.largo/2, barra1.ancho, barra1.largo);
+    ctx.fillRect(barra1.x, canvasAlto/2 - barra1.largo/2, barra1.ancho, barra1.largo);
     // Barra 2
     ctx.fillStyle = barra2.color;
-    ctx.fillRect(barra2.x - barra2.ancho, barra2.y - barra2.largo/2, barra2.ancho, barra2.largo);
+    ctx.fillRect(barra2.x - barra2.ancho, canvasAlto/2 - barra2.largo/2, barra2.ancho, barra2.largo);
     //Asignar ganador
     ctx.font = "50px ArcadeClassic";
     ctx.fillStyle = "white";
@@ -275,7 +366,7 @@ function clicPantalla(evento){
     let posY = evento.pageY - canvas.offsetTop;
     // Boton Empezar
     if((posX > botonEmpezar.x - botonEmpezar.largo/2 && posX < botonEmpezar.x + botonEmpezar.largo/2)
-        && (posY > botonEmpezar.y - botonEmpezar.alto/2 && posY < botonEmpezar.y + botonEmpezar.alto/2)){
+        && (posY > botonEmpezar.y - botonEmpezar.alto/2 && posY < botonEmpezar.y + botonEmpezar.alto/2) && !empezoJuego){
         empezar();
     }
 }
@@ -285,7 +376,7 @@ function movimientoMouse(evento){
     let posY = evento.pageY - canvas.offsetTop;
     // Boton Empezar
     if((posX > botonEmpezar.x - botonEmpezar.largo/2 && posX < botonEmpezar.x + botonEmpezar.largo/2)
-        && (posY > botonEmpezar.y - botonEmpezar.alto/2 && posY < botonEmpezar.y + botonEmpezar.alto/2)){
+        && (posY > botonEmpezar.y - botonEmpezar.alto/2 && posY < botonEmpezar.y + botonEmpezar.alto/2) && !empezoJuego){
         canvas.style.cursor = "pointer";
     } else  {
         canvas.style.cursor = "default";
