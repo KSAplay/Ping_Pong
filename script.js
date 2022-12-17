@@ -13,10 +13,10 @@ const FPS = 140;
 var moverBarra1Arriba = false, moverBarra1Abajo = false, moverBarra2Arriba = false, moverBarra2Abajo = false;
 var distanciaBarras = 40, velocidadBarras = 8;
 var largoBarrasDefault = canvasAlto/5;
-var puntajeBarra1 = 0, puntajeBarra2 = 0, meta = 5;
+var puntajeBarra1 = 0, puntajeBarra2 = 0, meta = 10;
 var nombreJugador1 = "Jugador 1", nombreJugador2 = "Jugador 2";
 var update, empezoJuego = false;
-var touchX = [], touchY = [];
+var touchX = [], touchY = [], mostrarBotones = false;
 
 var barra1 = {
     x: distanciaBarras,
@@ -67,7 +67,7 @@ if(window.innerWidth > 1200 && window.innerHeight > 500){
     largoBarrasDefault = canvasAlto/6;
 } else {
     puntaje.tamaño = "30px";
-    pelota.velocidad = 4;
+    pelota.velocidad = 3;
     pelota.radio = pelota.radio/2;
     canvasAncho = window.innerWidth - window.innerWidth/14;
     canvasAlto = window.innerHeight;
@@ -113,7 +113,7 @@ document.onkeyup = function(evento){
     }
 };
 
-window.ontouchstart = window.ontouchmove = (event) => {
+window.ontouchstart = (event) => {
     for(let i = 0; i < 4; i++){
         touchX[i] = event.touches[i].clientX;
         touchY[i] = event.touches[i].clientY;
@@ -140,25 +140,27 @@ window.ontouchstart = window.ontouchmove = (event) => {
     }
 };
 
-// window.ontouchend = (event) => {
-//     for(let i = 0; i < 4; i++){
-//         if(empezoJuego){
-//             if(touchX[i] < canvasAncho/2){
-//                 if(touchY[i] < canvasAlto/2){
-//                     moverBarra1Arriba = false;
-//                 } else {
-//                     moverBarra1Abajo = false;
-//                 }
-//             } else{
-//                 if(touchY[i] < canvasAlto/2){
-//                     moverBarra2Arriba = false;
-//                 } else {
-//                     moverBarra2Abajo = false;
-//                 }
-//             }
-//         }
-//     }
-// };
+window.ontouchend = (event) => {
+    for(let i = 0; i < 4; i++){
+        if(empezoJuego){
+            if(touchX[i] < canvasAncho/2 && touchX[i] != 0){
+                if(touchY[i] < canvasAlto/2){
+                    moverBarra1Arriba = false;
+                } else {
+                    moverBarra1Abajo = false;
+                }
+            } else{
+                if(touchY[i] < canvasAlto/2){
+                    moverBarra2Arriba = false;
+                } else {
+                    moverBarra2Abajo = false;
+                }
+            }
+        }
+        touchX[i] = null;
+        touchY[i] = null;
+    }
+};
 
 function inicio(){
     // Bordes
@@ -198,12 +200,12 @@ function inicio(){
 function bucle(){
     actualizarPantalla();
     // Puntaje
+    ctx.beginPath();
     ctx.font = puntaje.tamaño+" ArcadeClassic";
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.fillText(puntajeBarra1+" - "+puntajeBarra2, canvasAncho/2, canvasAlto/7);
     // Barra 1
-    ctx.beginPath();
     ctx.fillStyle = barra1.color;
     ctx.fillRect(barra1.x, barra1.y - barra1.largo/2, barra1.ancho, barra1.largo);
     // Barra 2
@@ -212,12 +214,6 @@ function bucle(){
     // Pelota
     ctx.fillStyle = pelota.color;
     ctx.fillRect(pelota.x - pelota.radio/2, pelota.y - pelota.radio/2, pelota.radio, pelota.radio);
-    
-    ctx.font = "10px Arial";
-    ctx.fillStyle = "white";
-    ctx.textAlign = "center";
-    ctx.fillText(touchX[1]+" - "+touchY[1], canvasAncho/2, canvasAlto - canvasAlto/7);
-
     ctx.closePath();
 
     switch (pelota.direccion.x) {
