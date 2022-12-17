@@ -9,14 +9,14 @@ var canvasAlto = window.innerHeight-window.innerHeight/14;
 ctx.canvas.width  = canvasAncho;
 ctx.canvas.height = canvasAlto;
 
-const FPS = 140;
+const FPS = 140; //140
 var moverBarra1Arriba = false, moverBarra1Abajo = false, moverBarra2Arriba = false, moverBarra2Abajo = false;
 var distanciaBarras = 40, velocidadBarras = 8;
 var largoBarrasDefault = canvasAlto/5;
-var puntajeBarra1 = 0, puntajeBarra2 = 0, meta = 10;
+var puntajeBarra1 = 0, puntajeBarra2 = 0, meta = 5;
 var nombreJugador1 = "Jugador 1", nombreJugador2 = "Jugador 2";
 var update, empezoJuego = false;
-var touchX = [], touchY = [], mostrarBotones = false;
+var touchX = [], touchY = [], mostrarGuia = false;
 
 var barra1 = {
     x: distanciaBarras,
@@ -40,7 +40,7 @@ var pelota = {
     x: canvasAncho/2,
     y: canvasAlto/2,
     color: "white",
-    radio : 15,
+    radio : 15, //15
     velocidad: 7,
     direccion: {
         x: "derecha",
@@ -186,93 +186,46 @@ function inicio(){
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.fillText("Ping    Pong", canvasAncho/2, canvasAlto/4);
-    // - Boton Empezar
+    // - Boton Empezar con su texto
     ctx.fillStyle = botonEmpezar.color;
     ctx.fillRect(botonEmpezar.x - botonEmpezar.largo/2, botonEmpezar.y - botonEmpezar.alto/2, botonEmpezar.largo, botonEmpezar.alto);
     ctx.fillRect(botonEmpezar.x - botonEmpezar.largo/2 - 8, botonEmpezar.y - botonEmpezar.alto/2 + 6, botonEmpezar.largo + 16, botonEmpezar.alto - 12);
     ctx.font = "32px ArcadeClassic";
     ctx.fillStyle = botonEmpezar.colorTexto;
     ctx.fillText(botonEmpezar.texto, botonEmpezar.x-2, botonEmpezar.y+9);
-    ctx.fill();
     ctx.closePath();
+    // - Guia de botones
+    if(mostrarGuia){
+
+    }
 }
 
 function bucle(){
+
+    empezoJuego = true;
     actualizarPantalla();
-    // Puntaje
-    ctx.beginPath();
-    ctx.font = puntaje.tamaño+" ArcadeClassic";
-    ctx.fillStyle = "white";
-    ctx.textAlign = "center";
-    ctx.fillText(puntajeBarra1+" - "+puntajeBarra2, canvasAncho/2, canvasAlto/7);
-    // Barra 1
-    ctx.fillStyle = barra1.color;
-    ctx.fillRect(barra1.x, barra1.y - barra1.largo/2, barra1.ancho, barra1.largo);
-    // Barra 2
-    ctx.fillStyle = barra2.color;
-    ctx.fillRect(barra2.x - barra2.ancho, barra2.y - barra2.largo/2, barra2.ancho, barra2.largo);
-    // Pelota
-    ctx.fillStyle = pelota.color;
-    ctx.fillRect(pelota.x - pelota.radio/2, pelota.y - pelota.radio/2, pelota.radio, pelota.radio);
-    ctx.closePath();
 
-    switch (pelota.direccion.x) {
-        case "izquierda":
-            pelota.x -= pelota.velocidad;
-            break;
-        case "derecha":
-            pelota.x += pelota.velocidad;
-            break;
+    for(let i=1 ; i<=pelota.velocidad; i++){
+        switch (pelota.direccion.x) {
+            case "izquierda":
+                pelota.x -= 1;
+                break;
+            case "derecha":
+                pelota.x += 1;
+                break;
+        }
+    
+        switch (pelota.direccion.y) {
+            case "arriba":
+                pelota.y -= 1;
+                break;
+            case "abajo":
+                pelota.y += 1;
+                break;
+        }
+        actualizarPantalla();
     }
-
-    switch (pelota.direccion.y) {
-        case "arriba":
-            pelota.y -= pelota.velocidad;
-            break;
-        case "abajo":
-            pelota.y += pelota.velocidad;
-            break;
-    }
-
-    // ----- Detecta la pelota en los bordes -----
-    if(pelota.y + pelota.radio/2 >= canvasAlto){
-        pelota.direccion.y = "arriba";
-    }
-
-    if(pelota.y - pelota.radio/2 <= 0){
-        pelota.direccion.y = "abajo";
-    }
-    // ----- Detecta la pelota en en las barras o en los bordes de los costados -----
-    if((pelota.x + pelota.radio/2 >= barra2.x - barra2.ancho && pelota.x + pelota.radio/2 < barra2.x - barra2.ancho/2)
-        && ((pelota.y - pelota.radio/2 > barra2.y - barra2.largo/2 && pelota.y - pelota.radio/2 < barra2.y + barra2.largo/2)
-        || (pelota.y + pelota.radio/2 > barra2.y - barra2.largo/2 && pelota.y - pelota.radio/2 < barra2.y + barra2.largo/2))){
-        pelota.direccion.x = "izquierda";
-        // if(pelota.y < barra2.y){
-        //     pelota.direccion.y = "arriba";
-        // } else {
-        //     pelota.direccion.y = "abajo";
-        // }
-    } else if(pelota.x + pelota.radio/2 >= canvasAncho){
-        pelota.x = barra1.x + barra1.ancho + pelota.radio/2;
-        pelota.y = barra1.y;
-        puntajeBarra1++;
-    }
-
-    if((pelota.x - pelota.radio/2 <= barra1.x + barra1.ancho && pelota.x - pelota.radio/2 > barra1.x + barra1.ancho/2)
-        && ((pelota.y - pelota.radio/2 > barra1.y - barra1.largo/2 && pelota.y - pelota.radio/2 < barra1.y + barra1.largo/2)
-        || (pelota.y + pelota.radio/2 > barra1.y - barra1.largo/2 && pelota.y - pelota.radio/2 < barra1.y + barra1.largo/2))){
-        pelota.direccion.x = "derecha";
-        // if(pelota.y < barra1.y){
-        //     pelota.direccion.y = "arriba";
-        // } else {
-        //     pelota.direccion.y = "abajo";
-        // }
-    } else if(pelota.x - pelota.radio/2 <= 0){
-        pelota.x = barra2.x - barra2.ancho - pelota.radio/2;
-        pelota.y = barra2.y;
-        puntajeBarra2++;
-    }
-    // ------------------------------------------------------------
+    // ---------- Movimieto de la Barra 1 ----------
     if(moverBarra1Arriba){
         if(barra1.y - barra1.largo/2 - barra1.velocidad <= 0){
             barra1.y = barra1.largo/2;
@@ -286,7 +239,7 @@ function bucle(){
             barra1.y += barra1.velocidad;
         }
     }
-
+    // ---------- Movimieto de la Barra 2 ----------
     if(moverBarra2Arriba){
         if(barra2.y - barra2.largo/2 - barra2.velocidad <= 0){
             barra2.y = barra2.largo/2;
@@ -300,9 +253,55 @@ function bucle(){
             barra2.y += barra2.velocidad;
         }
     }
+    // ----- Detecta la pelota en los bordes -----
+    if(pelota.y + pelota.radio/2 >= canvasAlto){
+        pelota.direccion.y = "arriba";
+    }
 
-    empezoJuego = true;
-
+    if(pelota.y - pelota.radio/2 <= 0){
+        pelota.direccion.y = "abajo";
+    }
+    // ---------- Detecta la pelota si rebota en la barra 1 ----------
+    if((pelota.x + pelota.radio/2 >= barra2.x - barra2.ancho && pelota.x + pelota.radio/2 < barra2.x - barra2.ancho/2)
+        && ((pelota.y - pelota.radio/2 > barra2.y - barra2.largo/2 && pelota.y - pelota.radio/2 < barra2.y + barra2.largo/2)
+        || (pelota.y + pelota.radio/2 > barra2.y - barra2.largo/2 && pelota.y - pelota.radio/2 < barra2.y + barra2.largo/2))){
+        
+        pelota.direccion.x = "izquierda";
+        // Cambia la direccion de Y de la pelota si rebota arriba o abajo de la barra 1
+        // if(pelota.y < barra2.y){
+        //     pelota.direccion.y = "arriba";
+        // } else {
+        //     pelota.direccion.y = "abajo";
+        // }
+    // Si la elota toca los bordes laterales de la barra
+    } else if(pelota.x + pelota.radio/2 >= canvasAncho){
+        pelota.x = barra1.x + barra1.ancho + pelota.radio/2;
+        pelota.y = barra1.y;
+        puntajeBarra1++;
+    
+    } else if(pelota.x + pelota.radio/2 >= canvasAncho){
+        pelota.x = barra1.x + barra1.ancho + pelota.radio/2;
+        pelota.y = barra1.y;
+        puntajeBarra1++;
+    }
+    // ---------- Detecta la pelota si rebota en la barra 2 ----------
+    if((pelota.x - pelota.radio/2 <= barra1.x + barra1.ancho && pelota.x - pelota.radio/2 > barra1.x + barra1.ancho/2)
+        && ((pelota.y - pelota.radio/2 > barra1.y - barra1.largo/2 && pelota.y - pelota.radio/2 < barra1.y + barra1.largo/2)
+        || (pelota.y + pelota.radio/2 > barra1.y - barra1.largo/2 && pelota.y - pelota.radio/2 < barra1.y + barra1.largo/2))){
+        
+        pelota.direccion.x = "derecha";
+        // Cambia la direccion de Y de la pelota si rebota arriba o abajo de la barra 1
+        // if(pelota.y < barra1.y){
+        //     pelota.direccion.y = "arriba";
+        // } else {
+        //     pelota.direccion.y = "abajo";
+        // }
+    } else if(pelota.x - pelota.radio/2 <= 0){
+        pelota.x = barra2.x - barra2.ancho - pelota.radio/2;
+        pelota.y = barra2.y;
+        puntajeBarra2++;
+    }
+    // ---------- Verifica si terminó el juego ----------
     if(puntajeBarra1 == meta){
         detenerJuego(nombreJugador1);
     } else if(puntajeBarra2 == meta){
@@ -314,7 +313,7 @@ function bucle(){
 function detenerJuego(ganador){
     clearInterval(update);
     empezoJuego = false;
-    actualizarPantalla();
+    limpiarPantalla();
     // Puntaje
     ctx.font = puntaje.tamaño+" ArcadeClassic";
     ctx.fillStyle = "white";
@@ -342,18 +341,34 @@ function reset(){
     
 }
 
-function evaluarRebote(){
-    
-}
-
-function actualizarPantalla(){
+function limpiarPantalla(){
     ctx.clearRect(0, 0, canvasAncho, canvasAlto);
-
+    // Dibujar bordes
     ctx.beginPath();
     ctx.strokeStyle = "white";
     ctx.lineWidth = 15;
     ctx.strokeRect(0,0,canvasAncho, canvasAlto);
     ctx.stroke();
+    ctx.closePath();
+}
+
+function actualizarPantalla(){
+    limpiarPantalla();
+    // Puntaje
+    ctx.beginPath();
+    ctx.font = puntaje.tamaño+" ArcadeClassic";
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.fillText(puntajeBarra1+" - "+puntajeBarra2, canvasAncho/2, canvasAlto/7);
+    // Barra 1
+    ctx.fillStyle = barra1.color;
+    ctx.fillRect(barra1.x, barra1.y - barra1.largo/2, barra1.ancho, barra1.largo);
+    // Barra 2
+    ctx.fillStyle = barra2.color;
+    ctx.fillRect(barra2.x - barra2.ancho, barra2.y - barra2.largo/2, barra2.ancho, barra2.largo);
+    // Pelota
+    ctx.fillStyle = pelota.color;
+    ctx.fillRect(pelota.x - pelota.radio/2, pelota.y - pelota.radio/2, pelota.radio, pelota.radio);
     ctx.closePath();
 }
 
