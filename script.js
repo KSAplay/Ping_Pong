@@ -399,4 +399,4 @@ function movimientoMouse(evento){
     }
 }
 
-inicio();
+document.fonts.ready.then(inicio);
