@@ -9,20 +9,20 @@ var canvasAlto = window.innerHeight-window.innerHeight/14;
 ctx.canvas.width  = canvasAncho;
 ctx.canvas.height = canvasAlto;
 
-const FPS = 140; //140
 var moverBarra1Arriba = false, moverBarra1Abajo = false, moverBarra2Arriba = false, moverBarra2Abajo = false;
-var distanciaBarras = 40, velocidadBarras = 8;
-var largoBarrasDefault = canvasAlto/5;
+var distanciaBarras = 40, velocidadBarras = 14;
+var largoBarrasDefault = canvasAlto/5, grosorBorde = 15;
 var puntajeBarra1 = 0, puntajeBarra2 = 0, meta = 5;
 var nombreJugador1 = "Jugador 1", nombreJugador2 = "Jugador 2";
 var update, empezoJuego = false;
 var touchX = [], touchY = [], mostrarGuia = false;
 
+
 var barra1 = {
     x: distanciaBarras,
     y: canvasAlto/2,
     largo: largoBarrasDefault,
-    ancho: 20,
+    ancho: grosorBorde,
     color: "white",
     velocidad: velocidadBarras
 };
@@ -31,7 +31,7 @@ var barra2 = {
     x: canvasAncho - distanciaBarras,
     y: canvasAlto/2,
     largo: largoBarrasDefault,
-    ancho: 20,
+    ancho: grosorBorde,
     color: "white",
     velocidad: velocidadBarras
 };
@@ -40,8 +40,8 @@ var pelota = {
     x: canvasAncho/2,
     y: canvasAlto/2,
     color: "white",
-    radio : 15, //15
-    velocidad: 7,
+    radio : 15, // 15
+    velocidad: 14, // 7
     direccion: {
         x: "derecha",
         y: "arriba"
@@ -62,12 +62,12 @@ var botonEmpezar = {
     largo: 110
 };
 
-if(window.innerWidth > 1200 && window.innerHeight > 500){
+if(window.innerWidth > 1200){
     puntaje.tamaño = "50px";
     largoBarrasDefault = canvasAlto/6;
 } else {
     puntaje.tamaño = "30px";
-    pelota.velocidad = 3;
+    pelota.velocidad = pelota.velocidad/2;
     pelota.radio = pelota.radio/2;
     canvasAncho = window.innerWidth - window.innerWidth/14;
     canvasAlto = window.innerHeight;
@@ -75,8 +75,8 @@ if(window.innerWidth > 1200 && window.innerHeight > 500){
     ctx.canvas.height = canvasAlto;
     barra1.velocidad = velocidadBarras/2;
     barra2.velocidad = velocidadBarras/2;
-    barra1.ancho = barra1.ancho/2;
-    barra2.ancho = barra2.ancho/2;
+    barra1.ancho = grosorBorde/2;
+    barra2.ancho = grosorBorde/2;
     
 }
 
@@ -111,7 +111,7 @@ document.onkeyup = function(evento){
     } else if(evento.key == "ArrowDown"){
         moverBarra2Abajo = false;
     }
-};
+}
 
 window.ontouchstart = (event) => {
     for(let i = 0; i < 4; i++){
@@ -138,7 +138,7 @@ window.ontouchstart = (event) => {
             }
         }
     }
-};
+}
 
 window.ontouchend = (event) => {
     for(let i = 0; i < 4; i++){
@@ -160,13 +160,16 @@ window.ontouchend = (event) => {
         touchX[i] = null;
         touchY[i] = null;
     }
-};
+}
 
+function empezar(){
+    update = window.requestAnimationFrame(bucle);
+}
 function inicio(){
     // Bordes
     ctx.beginPath();
     ctx.strokeStyle = "white";
-    ctx.lineWidth = 15;
+    ctx.lineWidth = grosorBorde;
     ctx.strokeRect(0,0,canvasAncho, canvasAlto);
     ctx.stroke();
     ctx.closePath();
@@ -200,12 +203,12 @@ function inicio(){
     }
 }
 
-function bucle(){
+const bucle = () => {
 
     empezoJuego = true;
     actualizarPantalla();
 
-    for(let i=1 ; i<=pelota.velocidad; i++){
+    for(let i=1 ; i <= pelota.velocidad; i++){
         switch (pelota.direccion.x) {
             case "izquierda":
                 pelota.x -= 1;
@@ -254,64 +257,66 @@ function bucle(){
         }
     }
     // ----- Detecta la pelota en los bordes -----
-    if(pelota.y + pelota.radio/2 >= canvasAlto){
+    if(pelota.y + pelota.radio/2 >= canvasAlto - grosorBorde/2){
         pelota.direccion.y = "arriba";
     }
 
-    if(pelota.y - pelota.radio/2 <= 0){
+    if(pelota.y - pelota.radio/2 <= grosorBorde/2){
         pelota.direccion.y = "abajo";
     }
     // ---------- Detecta la pelota si rebota en la barra 1 ----------
-    if((pelota.x + pelota.radio/2 >= barra2.x - barra2.ancho && pelota.x + pelota.radio/2 < barra2.x - barra2.ancho/2)
-        && ((pelota.y - pelota.radio/2 > barra2.y - barra2.largo/2 && pelota.y - pelota.radio/2 < barra2.y + barra2.largo/2)
-        || (pelota.y + pelota.radio/2 > barra2.y - barra2.largo/2 && pelota.y - pelota.radio/2 < barra2.y + barra2.largo/2))){
-        
-        pelota.direccion.x = "izquierda";
-        // Cambia la direccion de Y de la pelota si rebota arriba o abajo de la barra 1
-        // if(pelota.y < barra2.y){
-        //     pelota.direccion.y = "arriba";
-        // } else {
-        //     pelota.direccion.y = "abajo";
-        // }
-    // Si la elota toca los bordes laterales de la barra
-    } else if(pelota.x + pelota.radio/2 >= canvasAncho){
-        pelota.x = barra1.x + barra1.ancho + pelota.radio/2;
-        pelota.y = barra1.y;
-        puntajeBarra1++;
-    
-    } else if(pelota.x + pelota.radio/2 >= canvasAncho){
-        pelota.x = barra1.x + barra1.ancho + pelota.radio/2;
-        pelota.y = barra1.y;
-        puntajeBarra1++;
-    }
-    // ---------- Detecta la pelota si rebota en la barra 2 ----------
-    if((pelota.x - pelota.radio/2 <= barra1.x + barra1.ancho && pelota.x - pelota.radio/2 > barra1.x + barra1.ancho/2)
-        && ((pelota.y - pelota.radio/2 > barra1.y - barra1.largo/2 && pelota.y - pelota.radio/2 < barra1.y + barra1.largo/2)
-        || (pelota.y + pelota.radio/2 > barra1.y - barra1.largo/2 && pelota.y - pelota.radio/2 < barra1.y + barra1.largo/2))){
+    if(barra1.x < pelota.x
+        && barra1.x + barra1.ancho > pelota.x - pelota.radio/2
+        && pelota.y > barra1.y - barra1.largo/2 - pelota.radio/2
+        && pelota.y < barra1.y + barra1.largo/2 + pelota.radio/2){
         
         pelota.direccion.x = "derecha";
-        // Cambia la direccion de Y de la pelota si rebota arriba o abajo de la barra 1
+        // Cambia la direccion de Y de la pelota si rebota arriba o abajo de la mitad de la barra 1
         // if(pelota.y < barra1.y){
         //     pelota.direccion.y = "arriba";
         // } else {
         //     pelota.direccion.y = "abajo";
         // }
-    } else if(pelota.x - pelota.radio/2 <= 0){
+    }
+    // ---------- Detecta la pelota si rebota en la barra 2 ----------
+    if(barra2.x > pelota.x
+        && barra2.x - barra2.ancho < pelota.x + pelota.radio/2
+        && pelota.y > barra2.y - barra2.largo/2 - pelota.radio/2
+        && pelota.y < barra2.y + barra2.largo/2 + pelota.radio/2){
+        
+        pelota.direccion.x = "izquierda";
+        // Cambia la direccion de Y de la pelota si rebota arriba o abajo de la mitad de la barra 2
+        // if(pelota.y < barra2.y){
+        //     pelota.direccion.y = "arriba";
+        // } else {
+        //     pelota.direccion.y = "abajo";
+        // }
+    }
+
+    if(pelota.x - pelota.radio/2 <= grosorBorde/2){
         pelota.x = barra2.x - barra2.ancho - pelota.radio/2;
         pelota.y = barra2.y;
         puntajeBarra2++;
+    }
+
+    if(pelota.x + pelota.radio/2 >= canvasAncho - grosorBorde/2){
+        pelota.x = barra1.x + barra1.ancho + pelota.radio/2;
+        pelota.y = barra1.y;
+        puntajeBarra1++;
     }
     // ---------- Verifica si terminó el juego ----------
     if(puntajeBarra1 == meta){
         detenerJuego(nombreJugador1);
     } else if(puntajeBarra2 == meta){
         detenerJuego(nombreJugador2);
+    } else {
+        update = window.requestAnimationFrame(bucle);
     }
     
 }
 
 function detenerJuego(ganador){
-    clearInterval(update);
+    cancelAnimationFrame(update);
     empezoJuego = false;
     limpiarPantalla();
     // Puntaje
@@ -333,12 +338,12 @@ function detenerJuego(ganador){
     ctx.fillText(ganador+"   gana  !", canvasAncho/2, canvasAlto/2);
 }
 
-function empezar(){
-    update = setInterval(bucle, 1000/FPS);
-}
-
 function reset(){
     
+}
+
+function detectarRebote(){
+
 }
 
 function limpiarPantalla(){
@@ -346,7 +351,7 @@ function limpiarPantalla(){
     // Dibujar bordes
     ctx.beginPath();
     ctx.strokeStyle = "white";
-    ctx.lineWidth = 15;
+    ctx.lineWidth = grosorBorde;
     ctx.strokeRect(0,0,canvasAncho, canvasAlto);
     ctx.stroke();
     ctx.closePath();
