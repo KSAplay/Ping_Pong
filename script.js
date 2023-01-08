@@ -7,10 +7,10 @@ const ctx = canvas.getContext('2d');
 var canvasAncho, canvasAlto;
 
 // Audios
-const audio_rebote = new Audio("/assets/sounds/rebote.ogg");
-const audio_punto = new Audio("/assets/sounds/punto.ogg");
-const audio_gameover = new Audio("/assets/sounds/gameover.ogg");
-const audio_clic = new Audio("/assets/sounds/rebote.ogg");
+const audio_rebote = new Audio("assets/sounds/rebote.ogg");
+const audio_punto = new Audio("assets/sounds/punto.ogg");
+const audio_gameover = new Audio("assets/sounds/gameover.ogg");
+const audio_clic = new Audio("assets/sounds/rebote.ogg");
 
 // Variables
 const SEGUNDO = 1000;
