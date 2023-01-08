@@ -4,13 +4,59 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <link rel="icon" href="/assets/icon/ping-pong-icono.png" type="image/png">
         <link rel="preload" as="font" href="https://fonts.cdnfonts.com/s/6071/ARCADECLASSIC.woff" type="font/woff" crossorigin>
         <link rel="preload" as="style" href="styles.css">
         <link rel="stylesheet" type="text/css" href="styles.css">
         <title>Ping Pong</title>
     </head>
     <body>
-        <canvas id="mesa" draggable="false"></canvas>
+        <div class="main-container">
+            <canvas id="mesa" draggable="false"></canvas>
+
+            <div class="aviso-girar-pantalla">
+                <p>Gira&nbsp;&nbsp;&nbsp;la&nbsp;&nbsp;&nbsp;pantalla<br>por&nbsp;&nbsp;&nbsp;favor</p>
+            </div>
+
+            <div class="puntaje">
+                <span class="puntaje-1">0</span>
+                <span class="puntaje-2">0</span>
+            </div>
+
+            <div class="interfaz">
+
+                <div class="titulo-ping-pong">
+                    <span>PING&nbsp;&nbsp;&nbsp;PONG</span>
+                </div>
+
+                <div class="menu menu-principal">
+                    <div class="boton boton-un-jugador" onclick="empezar()"><p>UN JUGADOR</p></div>
+                    <div class="boton boton-multijugador"><p>MULTIJUGADOR</div>
+                    <div class="boton boton-opciones" onclick="mostrarOpciones()"><p>OPCIONES</p></div>
+                </div>
+
+                <div class="menu menu-opciones">
+                    <div class="boton boton-pantalla" onclick="pantallaCompleta()"><p>PANTALLA&nbsp;&nbsp;&nbsp;COMPLETA<span class="checkbox screen"></span></p></div>
+                    <div class="boton boton-pantalla" onclick="mutear()"><p>SILENCIAR<span class="checkbox mute"></span></p></div>
+                    <div class="boton boton-regresar" onclick="regresar()"><p>REGRESAR</p></div>
+                </div>
+
+                <footer>
+                    <span>&copy; 2023 - Made by Kenny</span>
+                    <div class="icons">
+                        <a class="icon" href="https://github.com/KSAplay" target="_blank"><i class="fa-brands fa-github"></i></a>
+                        <a class="icon" href="https://www.linkedin.com/in/kenny-saavedra-altuna/" target="_blank"><i class="fa-brands fa-linkedin"></i></a>
+                    </div>
+                </footer>
+            </div>
+
+            <div class="game-over">
+                <span class="ganador"></span>
+                <div class="boton boton-reintentar" onclick="reintentar()"><p>REINTENTAR</p></div>
+                <div class="boton boton-salir" onclick="salir()"><p>SALIR</p></div>
+            </div>
+        </div>
+        <script src="https://kit.fontawesome.com/7b9f8c27b2.js" crossorigin="anonymous"></script>
         <script src="script.js"></script>
     </body>
 </html>
