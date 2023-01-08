@@ -7,13 +7,15 @@ const ctx = canvas.getContext('2d');
 var canvasAncho, canvasAlto;
 
 // Audios
-const audio_rebote = new Audio("assets/sounds/rebote.ogg");
-const audio_punto = new Audio("assets/sounds/punto.ogg");
-const audio_gameover = new Audio("assets/sounds/gameover.ogg");
-const audio_clic = new Audio("assets/sounds/rebote.ogg");
+const audio_reboteBarra = new Audio("assets/sounds/rebote-barra.wav");
+const audio_reboteBorde = new Audio("assets/sounds/rebote-borde.wav");
+const audio_punto = new Audio("assets/sounds/punto.wav");
+const audio_gameOver = new Audio("assets/sounds/game-over.wav");
+const audio_pressBoton = new Audio("assets/sounds/boton.wav");
 
 // Variables
 const SEGUNDO = 1000;
+var timeDelta = 0;
 var moverBarra1Arriba, moverBarra1Abajo, moverBarra2Arriba, moverBarra2Abajo;
 var distanciaBarras, velocidadBarras;
 var largoBarrasDefault, grosorBorde = 15;
@@ -24,7 +26,7 @@ var touches = [];
 var minVelocidadX, maxVelocidadX;
 var minVelocidadY, maxVelocidadY;
 var menuActual = '.menu-principal', menuAnterior = '';
-var estaSilenciado = false;
+var estaSilenciado = false, unJugador = false, multijugador = false;
 
 // Objetos
 var barra1 = {x:0,y:0,largo:0,ancho:0,color:"white",velocidad:0};
@@ -40,11 +42,12 @@ document.onkeydown = function(evento){
     } else if(evento.key == "s" || evento.key == "S"){
         moverBarra1Abajo = true;
     }
-
-    if(evento.key == "ArrowUp"){
-        moverBarra2Arriba = true;
-    } else if(evento.key == "ArrowDown"){
-        moverBarra2Abajo = true;
+    if(!unJugador){
+        if(evento.key == "ArrowUp"){
+            moverBarra2Arriba = true;
+        } else if(evento.key == "ArrowDown"){
+            moverBarra2Abajo = true;
+        }   
     }
 }
 
@@ -55,11 +58,12 @@ document.onkeyup = function(evento){
     } else if(evento.key == "s" || evento.key == "S"){
         moverBarra1Abajo = false;
     }
-
-    if(evento.key == "ArrowUp"){
-        moverBarra2Arriba = false;
-    } else if(evento.key == "ArrowDown"){
-        moverBarra2Abajo = false;
+    if(!unJugador){
+        if(evento.key == "ArrowUp"){
+            moverBarra2Arriba = false;
+        } else if(evento.key == "ArrowDown"){
+            moverBarra2Abajo = false;
+        }
     }
 }
 
@@ -81,8 +85,10 @@ function detectarToque(evento){
                     moverBarra1Arriba = (touches[i].clientY < canvasAlto/2) ? true : false;
                     moverBarra1Abajo = (touches[i].clientY > canvasAlto/2) ? true : false;
                 } else {
-                    moverBarra2Arriba = (touches[i].clientY < canvasAlto/2) ? true : false;
-                    moverBarra2Abajo = (touches[i].clientY > canvasAlto/2) ? true : false;
+                    if(!unJugador){
+                        moverBarra2Arriba = (touches[i].clientY < canvasAlto/2) ? true : false;
+                        moverBarra2Abajo = (touches[i].clientY > canvasAlto/2) ? true : false;
+                    }
                 }
             }
         } else {
@@ -99,7 +105,7 @@ function empezar(){
     document.querySelector('.interfaz').style.display = 'none';
     document.querySelector('.puntaje').style.display = 'flex';
     update = window.requestAnimationFrame(bucle);
-    if(!estaSilenciado){audio_clic.play();}
+    if(!estaSilenciado){audio_pressBoton.play();}
 }
 function inicio(){
     // Establecer canvas
@@ -107,46 +113,8 @@ function inicio(){
     canvasAlto = window.innerHeight-window.innerHeight/14;
     ctx.canvas.width  = canvasAncho;
     ctx.canvas.height = canvasAlto;
-    // Establecer variables
-    moverBarra1Arriba = false; moverBarra1Abajo = false; moverBarra2Arriba = false; moverBarra2Abajo = false;
-    distanciaBarras = 40;
-    velocidadBarras = canvasAlto * 20 / SEGUNDO;
-    largoBarrasDefault = canvasAlto/6;
-    puntajeBarra1 = 0, puntajeBarra2 = 0;
-    empezoJuego = false;
-    minVelocidadX = canvasAncho * 0.4 / SEGUNDO; maxVelocidadX = canvasAncho * 0.7 / SEGUNDO;
-    minVelocidadY = canvasAncho * 0.2 / SEGUNDO; maxVelocidadY = canvasAncho * 0.7 / SEGUNDO;
-    // Establecer objetos
-    // --- Barra 1 ---
-    barra1.x = distanciaBarras;
-    barra1.y = canvasAlto/2;
-    barra1.largo = largoBarrasDefault;
-    barra1.ancho = grosorBorde;
-    barra1.color = "white";
-    barra1.velocidad = velocidadBarras;
-    // --- Barra 2 ---
-    barra2.x = canvasAncho - distanciaBarras;
-    barra2.y = canvasAlto/2;
-    barra2.largo = largoBarrasDefault;
-    barra2.ancho = grosorBorde;
-    barra2.color = "white";
-    barra2.velocidad = velocidadBarras;
-    // --- Pelota ---
-    pelota.x = canvasAncho/2;
-    pelota.y = canvasAlto/2;
-    pelota.color = "white";
-    pelota.radio = 15; // 15 por defecto
-    pelota.velocidadX = canvasAncho * 0.4 / SEGUNDO;
-    pelota.velocidadY = canvasAncho * 0.4 / SEGUNDO;
-    pelota.direccion.x = "derecha";
-    pelota.direccion.y = "arriba";
-
-    if(window.innerWidth < 990){
-        pelota.radio = pelota.radio * 0.6;
-        barra1.ancho = barra1.ancho * 0.8;
-        barra2.ancho = barra2.ancho * 0.8;
-    }
-
+    // Establecer variables y objetos
+    establecerValores();
     // Bordes
     ctx.beginPath();
     ctx.strokeStyle = "white";
@@ -166,7 +134,7 @@ const bucle = (time) => {
     actualizarPantalla();
 
     // ---------- Movimieto de la Pelota ----------
-    const timeDelta = lastTick ? (time - lastTick) : 0;
+    timeDelta = lastTick ? (time - lastTick) : 0;
     lastTick = time;
     pelota.x = pelota.x + ((pelota.direccion.x == "izquierda") ? -1 : 1) * pelota.velocidadX * timeDelta;
     pelota.y = pelota.y + ((pelota.direccion.y == "arriba") ? -1 : 1) * pelota.velocidadY * timeDelta;
@@ -187,12 +155,12 @@ const bucle = (time) => {
     // Borde de abajo
     if(pelota.y + pelota.radio/2 >= canvasAlto - grosorBorde/2){
         pelota.direccion.y = "arriba";
-        if(!estaSilenciado) {audio_rebote.play();}
+        if(!estaSilenciado) {audio_reboteBorde.play();}
     }
     // Borde de arriba
     if(pelota.y - pelota.radio/2 <= grosorBorde/2){
         pelota.direccion.y = "abajo";
-        if(!estaSilenciado) {audio_rebote.play();}
+        if(!estaSilenciado) {audio_reboteBorde.play();}
     }
     // ---------- Detecta la pelota si rebota en la barra 1 ----------
     if(barra1.x < pelota.x
@@ -205,7 +173,7 @@ const bucle = (time) => {
         pelota.velocidadY = ((pelota.y < barra1.y) ? barra1.y-pelota.y : pelota.y-barra1.y)/(barra1.largo/2+pelota.radio/2)*(maxVelocidadY - minVelocidadY)+minVelocidadY;
         pelota.velocidadX = ((pelota.y < barra1.y) ? pelota.y-(barra1.y-barra1.largo/2-pelota.radio/2) : (barra1.y+barra1.largo/2+pelota.radio/2)-pelota.y)/(barra1.largo/2+pelota.radio/2)*(maxVelocidadX - minVelocidadX)+minVelocidadX;
         // Reproduce audio de rebote con la barra
-        if(!estaSilenciado) {audio_rebote.play();}
+        if(!estaSilenciado) {audio_reboteBarra.play();}
     }
     // ---------- Detecta la pelota si rebota en la barra 2 ----------
     if(barra2.x > pelota.x
@@ -218,7 +186,7 @@ const bucle = (time) => {
         pelota.velocidadY = ((pelota.y < barra2.y) ? barra2.y-pelota.y : pelota.y-barra2.y)/(barra2.largo/2+pelota.radio/2)*(maxVelocidadY - minVelocidadY)+minVelocidadY;
         pelota.velocidadX = ((pelota.y < barra2.y) ? pelota.y-(barra2.y-barra2.largo/2-pelota.radio/2) : (barra2.y+barra2.largo/2+pelota.radio/2)-pelota.y)/(barra2.largo/2+pelota.radio/2)*(maxVelocidadX - minVelocidadX)+minVelocidadX;
         // Reproduce audio de rebote con la barra
-        if(!estaSilenciado) {audio_rebote.play();}
+        if(!estaSilenciado) {audio_reboteBarra.play();}
     }
 
     if(pelota.x - pelota.radio/2 <= grosorBorde/2){
@@ -243,6 +211,52 @@ const bucle = (time) => {
         update = window.requestAnimationFrame(bucle);
     }
     
+}
+
+function barraIA(){
+    
+}
+
+function establecerValores(){
+    // Establecer variables
+    moverBarra1Arriba = false; moverBarra1Abajo = false; moverBarra2Arriba = false; moverBarra2Abajo = false;
+    distanciaBarras = 40;
+    velocidadBarras = canvasAlto * 20 / SEGUNDO;
+    largoBarrasDefault = canvasAlto/6;
+    puntajeBarra1 = 0, puntajeBarra2 = 0;
+    timeDelta = 0; lastTick = 0; empezoJuego = false;
+    minVelocidadX = canvasAncho * 0.4 / SEGUNDO; maxVelocidadX = canvasAncho * 0.7 / SEGUNDO;
+    minVelocidadY = canvasAncho * 0.2 / SEGUNDO; maxVelocidadY = canvasAncho * 0.7 / SEGUNDO;
+    // Establecer objetos
+    // --- Barra 1 ---
+    barra1.x = distanciaBarras;
+    barra1.y = canvasAlto/2;
+    barra1.largo = largoBarrasDefault;
+    barra1.ancho = grosorBorde;
+    barra1.color = "white";
+    barra1.velocidad = velocidadBarras;
+    // --- Barra 2 ---
+    barra2.x = canvasAncho - distanciaBarras;
+    barra2.y = canvasAlto/2;
+    barra2.largo = largoBarrasDefault;
+    barra2.ancho = grosorBorde;
+    barra2.color = "white";
+    barra2.velocidad = velocidadBarras;
+    // --- Pelota ---
+    pelota.x = canvasAncho/2;
+    pelota.y = canvasAlto/2;
+    pelota.color = "white";
+    pelota.radio = 15; // 15 por defecto
+    pelota.velocidadX = canvasAncho * 0.4 / SEGUNDO;
+    pelota.velocidadY = canvasAncho * 0.4 / SEGUNDO;
+    pelota.direccion.x = numeroAleatorio(0,1) ? "izquierda" : "derecha";
+    pelota.direccion.y = numeroAleatorio(0,1) ? "arriba" : "abajo";
+
+    if(window.innerWidth < 990){
+        pelota.radio = pelota.radio * 0.6;
+        barra1.ancho = barra1.ancho * 0.8;
+        barra2.ancho = barra2.ancho * 0.8;
+    }
 }
 
 function moverBarra(barra, direccion){
@@ -284,19 +298,15 @@ function detenerJuego(ganador){
     document.querySelector('.ganador').textContent = ganador+"   gana  !";
     // Reproducir sonido de Game Over
     if(!estaSilenciado) {
-        audio_punto.pause();
         audio_punto.currentTime = 0;
-        audio_gameover.play();
+        audio_punto.pause();
+        audio_gameOver.play();
     }
 }
 
 function alertaTamaño(){
     document.querySelector('.interfaz').style.display = 'none';
     document.querySelector('.aviso-rotar-pantalla').style.display = 'flex';
-}
-
-function reset(){
-    inicio();
 }
 
 function limpiarPantalla(){
@@ -346,7 +356,7 @@ function mostrarOpciones(){
     menuActual = '.menu-opciones';
     document.querySelector(menuAnterior).style.display = 'none';
     document.querySelector(menuActual).style.display = 'block';
-    if(!estaSilenciado){audio_clic.play();}
+    if(!estaSilenciado){audio_pressBoton.play();}
 }
 
 function pantallaCompleta(){
@@ -355,13 +365,13 @@ function pantallaCompleta(){
     } else {
         document.documentElement.requestFullscreen();
     }
-    if(!estaSilenciado){audio_clic.play();}
+    if(!estaSilenciado){audio_pressBoton.play();}
     document.querySelector('.screen').classList.toggle('checked');
 }
 
 function mutear(){
     if(estaSilenciado){
-        audio_clic.play();
+        audio_pressBoton.play();
         estaSilenciado = false;
     } else {
         estaSilenciado = true;
@@ -375,19 +385,45 @@ function regresar(){
     document.querySelector(menuActual).style.display = 'none';
     menuActual = menuAnterior;
     menuAnterior = '';
-    if(!estaSilenciado){audio_clic.play();}
+    if(!estaSilenciado){audio_pressBoton.play();}
 }
 
-if(window.innerHeight > window.innerWidth){
-    ctx.clearRect(0,0,canvasAncho,canvasAlto);
-    document.querySelector('.puntaje').style.display = 'none';
-    document.querySelector('.interfaz').style.display = 'none';
-    document.querySelector('.aviso-girar-pantalla').style.display = 'flex';
-} else {
-    document.querySelector('.aviso-girar-pantalla').style.display = 'none';
-    document.querySelector('.interfaz').style.display = 'flex';
-    document.fonts.ready.then(inicio);
+function reintentar(){
+    establecerValores();
+    empezoJuego = true;
+    document.querySelector('.game-over').style.display = 'none';
+    document.querySelector('.puntaje').style.display = 'flex';
+    if(!estaSilenciado){audio_pressBoton.play();}
+    update = window.requestAnimationFrame(bucle);
 }
+
+function salir(){
+    document.querySelector('.puntaje').style.display = 'none';
+    document.querySelector('.game-over').style.display = 'none';
+    document.querySelector('.interfaz').style.display = 'flex';
+    if(!estaSilenciado){audio_pressBoton.play();}
+}
+
+function numeroAleatorio(min, max) {
+    return Math.round(Math.random() * (max - min) + min);
+}
+
+function reproducirAudio(){
+
+}
+
+window.onload = function() {
+    if(window.innerHeight > window.innerWidth){
+        ctx.clearRect(0,0,canvasAncho,canvasAlto);
+        document.querySelector('.puntaje').style.display = 'none';
+        document.querySelector('.interfaz').style.display = 'none';
+        document.querySelector('.aviso-girar-pantalla').style.display = 'flex';
+    } else {
+        document.querySelector('.aviso-girar-pantalla').style.display = 'none';
+        document.querySelector('.interfaz').style.display = 'flex';
+        document.fonts.ready.then(inicio);
+    }
+};
 
 window.addEventListener('resize', function() {
     if(empezoJuego){
