@@ -30,10 +30,36 @@ var menuActual = '.menu-principal', menuAnterior = '';
 var estaSilenciado = false, unJugador = false, multijugador = false;
 
 // Objetos
-var barra1 = {x:0,y:0,largo:0,ancho:0,color:"white",velocidad:0};
-var barra2 = {x:0,y:0,largo:0,ancho:0,color:"white",velocidad:0};
+const barra1 = {
+    x: 0,
+    y: 0,
+    largo: 0,
+    ancho: 0,
+    color: "white",
+    velocidad: 0
+};
 
-var pelota = {x:0,y:0,color:"white",radio:0,velocidadX:0,velocidadY:0,direccion:{x:0,y:0}};
+const barra2 = {
+    x: 0,
+    y: 0,
+    largo: 0,
+    ancho: 0,
+    color: "white",
+    velocidad: 0
+};
+
+const pelota = {
+    x: 0,
+    y: 0,
+    color: "white",
+    radio: 0,
+    velocidadX: 0,
+    velocidadY: 0,
+    direccion:{
+        x: 0,
+        y: 0
+    }
+};
 
 // Movimiento de las barras mediante teclado
 document.onkeydown = function(evento){
