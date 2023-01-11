@@ -27,7 +27,7 @@ var touches = [];
 var minVelocidadX, maxVelocidadX;
 var minVelocidadY, maxVelocidadY;
 var menuActual = '.menu-principal', menuAnterior = '';
-var estaSilenciado = false, unJugador = false, multijugador = false;
+var estaSilenciado = false, jugandoSolo = false, multijugadorLocal = false;
 
 // Objetos
 const barra1 = {
@@ -69,7 +69,7 @@ document.onkeydown = function(evento){
     } else if(evento.key == "s" || evento.key == "S"){
         moverBarra1Abajo = true;
     }
-    if(!unJugador){
+    if(!jugandoSolo){
         if(evento.key == "ArrowUp"){
             moverBarra2Arriba = true;
         } else if(evento.key == "ArrowDown"){
@@ -85,7 +85,7 @@ document.onkeyup = function(evento){
     } else if(evento.key == "s" || evento.key == "S"){
         moverBarra1Abajo = false;
     }
-    if(!unJugador){
+    if(!jugandoSolo){
         if(evento.key == "ArrowUp"){
             moverBarra2Arriba = false;
         } else if(evento.key == "ArrowDown"){
@@ -112,7 +112,7 @@ function detectarToque(evento){
                     moverBarra1Arriba = (touches[i].clientY < canvasAlto/2) ? true : false;
                     moverBarra1Abajo = (touches[i].clientY > canvasAlto/2) ? true : false;
                 } else {
-                    if(!unJugador){
+                    if(!jugandoSolo){
                         moverBarra2Arriba = (touches[i].clientY < canvasAlto/2) ? true : false;
                         moverBarra2Abajo = (touches[i].clientY > canvasAlto/2) ? true : false;
                     }
@@ -132,7 +132,7 @@ function empezar(){
     document.querySelector('.interfaz').style.display = 'none';
     document.querySelector('.puntaje').style.display = 'flex';
     update = window.requestAnimationFrame(bucle);
-    if(!estaSilenciado){audio_iniciarJuego.play();}
+    reproducirAudio(audio_iniciarJuego);
 }
 function inicio(){
     // Establecer canvas
@@ -158,6 +158,7 @@ function inicio(){
 }
 
 const bucle = (time) => {
+    // ---------- Renderizar la pantalla ----------
     actualizarPantalla();
 
     // ---------- Movimieto de la Pelota ----------
@@ -173,21 +174,26 @@ const bucle = (time) => {
         moverBarra(barra1,'abajo');
     }
     // ---------- Movimieto de la Barra 2 ----------
-    if(moverBarra2Arriba){
-        moverBarra(barra2,'arriba');
-    } else if(moverBarra2Abajo){
-        moverBarra(barra2,'abajo');
+    if(jugandoSolo){
+        barraIA();
+    } else {
+        if(moverBarra2Arriba){
+            moverBarra(barra2,'arriba');
+        } else if(moverBarra2Abajo){
+            moverBarra(barra2,'abajo');
+        }
     }
+
     // ----- Detecta la pelota en los bordes -----
     // Borde de abajo
     if(pelota.y + pelota.radio/2 >= canvasAlto - grosorBorde/2){
         pelota.direccion.y = "arriba";
-        if(!estaSilenciado) {audio_reboteBorde.play();}
+        reproducirAudio(audio_reboteBorde);
     }
     // Borde de arriba
     if(pelota.y - pelota.radio/2 <= grosorBorde/2){
         pelota.direccion.y = "abajo";
-        if(!estaSilenciado) {audio_reboteBorde.play();}
+        reproducirAudio(audio_reboteBorde);
     }
     // ---------- Detecta la pelota si rebota en la barra 1 ----------
     if(barra1.x < pelota.x
@@ -200,7 +206,7 @@ const bucle = (time) => {
         pelota.velocidadY = ((pelota.y < barra1.y) ? barra1.y-pelota.y : pelota.y-barra1.y)/(barra1.largo/2+pelota.radio/2)*(maxVelocidadY - minVelocidadY)+minVelocidadY;
         pelota.velocidadX = ((pelota.y < barra1.y) ? pelota.y-(barra1.y-barra1.largo/2-pelota.radio/2) : (barra1.y+barra1.largo/2+pelota.radio/2)-pelota.y)/(barra1.largo/2+pelota.radio/2)*(maxVelocidadX - minVelocidadX)+minVelocidadX;
         // Reproduce audio de rebote con la barra
-        if(!estaSilenciado) {audio_reboteBarra.play();}
+        reproducirAudio(audio_reboteBarra);
     }
     // ---------- Detecta la pelota si rebota en la barra 2 ----------
     if(barra2.x > pelota.x
@@ -213,7 +219,7 @@ const bucle = (time) => {
         pelota.velocidadY = ((pelota.y < barra2.y) ? barra2.y-pelota.y : pelota.y-barra2.y)/(barra2.largo/2+pelota.radio/2)*(maxVelocidadY - minVelocidadY)+minVelocidadY;
         pelota.velocidadX = ((pelota.y < barra2.y) ? pelota.y-(barra2.y-barra2.largo/2-pelota.radio/2) : (barra2.y+barra2.largo/2+pelota.radio/2)-pelota.y)/(barra2.largo/2+pelota.radio/2)*(maxVelocidadX - minVelocidadX)+minVelocidadX;
         // Reproduce audio de rebote con la barra
-        if(!estaSilenciado) {audio_reboteBarra.play();}
+        reproducirAudio(audio_reboteBarra);
     }
 
     // ---------- Detecta si la pelota golpea con el borde detras de las barras ----------
@@ -221,20 +227,16 @@ const bucle = (time) => {
         pelota.x = barra1.x + barra1.ancho + pelota.radio/2;
         pelota.y = barra1.y;
         puntajeBarra1++;
-        if(!estaSilenciado) {
-            if(puntajeBarra1 != metaPuntaje){
-                audio_punto.play();
-            }
+        if(puntajeBarra1 != metaPuntaje){
+            reproducirAudio(audio_punto);
         }
     }
     if(pelota.x - pelota.radio/2 <= grosorBorde/2){
         pelota.x = barra2.x - barra2.ancho - pelota.radio/2;
         pelota.y = barra2.y;
         puntajeBarra2++;
-        if(!estaSilenciado) {
-            if(puntajeBarra2 != metaPuntaje){
-                audio_punto.play();
-            }
+        if(puntajeBarra2 != metaPuntaje){
+            reproducirAudio(audio_punto);
         }
     }
     // ---------- Verifica si terminó el juego ----------
@@ -249,7 +251,22 @@ const bucle = (time) => {
 }
 
 function barraIA(){
-    
+    if(pelota.direccion.x === "derecha" && pelota.x > canvasAncho/2){
+        if(barra2.y < pelota.y){
+            if(barra2.y + barra2.largo/2 + barra2.velocidad >= canvasAlto - grosorBorde/2){
+                barra2.y = canvasAlto - barra2.largo/2 - grosorBorde/2;
+            } else {
+
+                barra2.y += barra2.velocidad;
+            }
+        } else {
+            if(barra2.y - barra2.largo/2 - barra2.velocidad <= grosorBorde/2){
+                barra2.y = barra2.largo/2 + grosorBorde/2;
+            } else {
+                barra2.y -= barra2.velocidad;
+            }
+        }
+    }
 }
 
 function establecerValores(){
@@ -305,7 +322,7 @@ function moverBarra(barra, direccion){
             break;
         case 'abajo':
             if(barra.y + barra.largo/2 + barra.velocidad >= canvasAlto - grosorBorde/2){
-                barra.y = canvasAlto - barra1.largo/2 - grosorBorde/2;
+                barra.y = canvasAlto - barra.largo/2 - grosorBorde/2;
             } else {
                 barra.y += barra.velocidad;
             }
@@ -332,12 +349,7 @@ function detenerJuego(ganador){
     document.querySelector('.game-over').style.display = 'flex';
     document.querySelector('.ganador').textContent = ganador+"   gana  !";
     // Reproducir sonido de Game Over
-    if(!estaSilenciado) {audio_gameOver.play();}
-}
-
-function alertaTamaño(){
-    document.querySelector('.interfaz').style.display = 'none';
-    document.querySelector('.aviso-rotar-pantalla').style.display = 'flex';
+    reproducirAudio(audio_gameOver);
 }
 
 function limpiarPantalla(){
@@ -382,12 +394,29 @@ function actualizarPantalla(){
     ctx.closePath();
 }
 
+function reproducirAudio(audio){
+    if(!estaSilenciado){
+        audio.play();
+    }
+}
+
+/* ------------------ FUNCIONES DEL MENU DEL JUEGO ------------------ */
+function unJugador(){
+    jugandoSolo = true;
+    empezar();
+}
+
+function multijugador(){
+    jugandoSolo = false;
+    empezar();
+}
+
 function mostrarOpciones(){
     menuAnterior = menuActual;
     menuActual = '.menu-opciones';
     document.querySelector(menuAnterior).style.display = 'none';
     document.querySelector(menuActual).style.display = 'block';
-    if(!estaSilenciado){audio_pressBoton.play();}
+    reproducirAudio(audio_pressBoton);
 }
 
 function pantallaCompleta(){
@@ -396,14 +425,14 @@ function pantallaCompleta(){
     } else {
         document.documentElement.requestFullscreen();
     }
-    if(!estaSilenciado){audio_pressBoton.play();}
+    reproducirAudio(audio_pressBoton);
     document.querySelector('.screen').classList.toggle('checked');
 }
 
 function mutear(){
     if(estaSilenciado){
-        audio_pressBoton.play();
         estaSilenciado = false;
+        reproducirAudio(audio_pressBoton);
     } else {
         estaSilenciado = true;
     }
@@ -416,7 +445,7 @@ function regresar(){
     document.querySelector(menuActual).style.display = 'none';
     menuActual = menuAnterior;
     menuAnterior = '';
-    if(!estaSilenciado){audio_pressBoton.play();}
+    reproducirAudio(audio_pressBoton);
 }
 
 function reintentar(){
@@ -424,7 +453,7 @@ function reintentar(){
     empezoJuego = true;
     document.querySelector('.game-over').style.display = 'none';
     document.querySelector('.puntaje').style.display = 'flex';
-    if(!estaSilenciado){audio_iniciarJuego.play();}
+    reproducirAudio(audio_iniciarJuego);
     update = window.requestAnimationFrame(bucle);
 }
 
@@ -433,16 +462,13 @@ function salir(){
     document.querySelector('.puntaje').style.display = 'none';
     document.querySelector('.game-over').style.display = 'none';
     document.querySelector('.interfaz').style.display = 'flex';
-    if(!estaSilenciado){audio_pressBoton.play();}
+    reproducirAudio(audio_pressBoton);
 }
 
 function numeroAleatorio(min, max) {
     return Math.round(Math.random() * (max - min) + min);
 }
 
-function reproducirAudio(){
-
-}
 
 window.onload = function() {
     if(window.innerHeight > window.innerWidth){
