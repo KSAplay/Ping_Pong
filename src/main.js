@@ -7,12 +7,12 @@ const ctx = canvas.getContext('2d');
 var canvasAncho, canvasAlto;
 
 // Audios
-const audio_reboteBarra = new Audio("assets/sounds/rebote-barra.wav");
-const audio_reboteBorde = new Audio("assets/sounds/rebote-borde.wav");
-const audio_punto = new Audio("assets/sounds/punto.wav");
-const audio_gameOver = new Audio("assets/sounds/game-over.wav");
-const audio_pressBoton = new Audio("assets/sounds/boton.wav");
-const audio_iniciarJuego = new Audio("assets/sounds/iniciar-juego.wav");
+const audio_reboteBarra = new Audio("src/assets/sounds/rebote-barra.wav");
+const audio_reboteBorde = new Audio("src/assets/sounds/rebote-borde.wav");
+const audio_punto = new Audio("src/assets/sounds/punto.wav");
+const audio_gameOver = new Audio("src/assets/sounds/game-over.wav");
+const audio_pressBoton = new Audio("src/assets/sounds/boton.wav");
+const audio_iniciarJuego = new Audio("src/assets/sounds/iniciar-juego.wav");
 
 // Variables
 const SEGUNDO = 1000;
@@ -395,8 +395,20 @@ function actualizarPantalla(){
 }
 
 function reproducirAudio(audio){
+    const audioAux = document.createElement("audio");
+    audioAux.src = audio.src;
+
+    //Agrega la etiqueta al body
+    document.body.appendChild(audioAux);
+
+    // Reproduce el archivo de audio
     if(!estaSilenciado){
-        audio.play();
+        audioAux.play();
+    }
+
+    audioAux.onended = function() {
+        // Elimina la etiqueta de audio del DOM
+        audioAux.remove();
     }
 }
 

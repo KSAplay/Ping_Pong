@@ -7,7 +7,7 @@
         <link rel="preload" as="font" href="https://fonts.cdnfonts.com/s/6071/ARCADECLASSIC.woff" type="font/woff" crossorigin>
         <link rel="preload" as="style" href="styles.css">
         <link rel="stylesheet" type="text/css" href="styles.css">
-        <link rel="icon" type="image/x-icon" href="assets/images/favicon.png">
+        <link rel="icon" type="image/x-icon" href="src/assets/images/favicon.png">
         <title>Ping Pong</title>
     </head>
     <body>
@@ -30,15 +30,15 @@
                 </div>
 
                 <div class="menu menu-principal">
-                    <div class="boton boton-un-jugador" onclick="unJugador()"><p>UN JUGADOR</p></div>
-                    <div class="boton boton-multijugador" onclick="multijugador()"><p>MULTIJUGADOR</div>
-                    <div class="boton boton-opciones" onclick="mostrarOpciones()"><p>OPCIONES</p></div>
+                    <div class="boton boton-un-jugador"><p>UN JUGADOR</p></div>
+                    <div class="boton boton-multijugador"><p>MULTIJUGADOR</div>
+                    <div class="boton boton-opciones"><p>OPCIONES</p></div>
                 </div>
 
                 <div class="menu menu-opciones">
-                    <div class="boton boton-pantalla" onclick="pantallaCompleta()"><p>PANTALLA&nbsp;&nbsp;&nbsp;COMPLETA<span class="checkbox screen"></span></p></div>
-                    <div class="boton boton-pantalla" onclick="mutear()"><p>SILENCIAR<span class="checkbox mute"></span></p></div>
-                    <div class="boton boton-regresar" onclick="regresar()"><p>REGRESAR</p></div>
+                    <div class="boton boton-pantalla-completa"><p>PANTALLA&nbsp;&nbsp;&nbsp;COMPLETA<span class="checkbox screen"></span></p></div>
+                    <div class="boton boton-silenciar"><p>SILENCIAR<span class="checkbox mute"></span></p></div>
+                    <div class="boton boton-regresar"><p>REGRESAR</p></div>
                 </div>
 
                 <footer>
@@ -52,11 +52,12 @@
 
             <div class="game-over">
                 <span class="ganador"></span>
-                <div class="boton boton-reintentar" onclick="reintentar()"><p>REINTENTAR</p></div>
-                <div class="boton boton-salir" onclick="salir()"><p>SALIR</p></div>
+                <div class="boton boton-reintentar"><p>REINTENTAR</p></div>
+                <div class="boton boton-salir"><p>SALIR</p></div>
             </div>
         </div>
         <script src="https://kit.fontawesome.com/7b9f8c27b2.js" crossorigin="anonymous"></script>
-        <script src="script.js"></script>
+        <!-- <script src="src/main.js"></script> -->
+        <script src="src/main2.js" type="module"></script>
     </body>
 </html>
