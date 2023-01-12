@@ -68,14 +68,15 @@ class Barra{
 }
 
 class Pelota {
-    constructor(x, y, color, radio, velocidadX, velocidadY, direccion) {
+    constructor(x, y, color, radio, velocidadX, velocidadY, direccionX, direccionY) {
         this.x = x;
         this.y = y;
         this.color = color;
         this.radio = radio;
         this.velocidadX = velocidadX;
         this.velocidadY = velocidadY;
-        this.direccion = direccion;
+        this.direccionX = direccionX;
+        this.direccionY = direccionY;
     }
     setX(x) {
         this.x = x;
@@ -95,8 +96,11 @@ class Pelota {
     setVelocidadY(velocidadY) {
         this.velocidadY = velocidadY;
     }
-    setDireccion(direccion) {
-        this.direccion = direccion;
+    setDireccionX(direccionX) {
+        this.direccionX = direccionX;
+    }
+    setDireccionY(direccionY) {
+        this.direccionY = direccionY;
     }
     getX() {
         return this.x;
@@ -116,13 +120,16 @@ class Pelota {
     getVelocidadY() {
         return this.velocidadY;
     }
-    getDireccion() {
-        return this.direccion;
+    getDireccionX() {
+        return this.direccionX;
+    }
+    getDireccionY() {
+        return this.direccionY;
     }
 }
 
-export const barra1 = new Barra(0, 0, 0, 0, "", 0);
+export const barra1 = new Barra();
 
-export const barra2 = new Barra(0, 0, 0, 0, "", 0);
+export const barra2 = new Barra();
 
-export const pelota = new Pelota(0, 0, "", 0, 0, 0, {x: 0, y: 0});
+export const pelota = new Pelota();

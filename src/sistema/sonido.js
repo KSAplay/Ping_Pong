@@ -10,12 +10,20 @@ var estaSilenciado = false;
 
 export function init(){
     document.querySelector('.boton-silenciar').addEventListener('click', silenciar);
+    let volumen = .5;
+    setVolumen(reboteBarra, volumen);
+    setVolumen(reboteBorde, volumen);
+    setVolumen(punto, volumen);
+    setVolumen(gameOver, volumen);
+    setVolumen(pressBoton, volumen);
+    setVolumen(iniciarJuego, volumen);
 }
 
 export function reproducir(audio){
     //Agrega la etiqueta al body
     const audioElement = document.createElement("audio");
     audioElement.src = audio.src;
+    audioElement.volume = audio.volume;
 
     //Agrega la etiqueta al body
     document.body.appendChild(audioElement);
@@ -39,4 +47,8 @@ export function silenciar(){
         estaSilenciado = true;
     }
     document.querySelector('.mute').classList.toggle('checked');
+}
+
+function setVolumen(audio, valor){
+    audio.volume = valor;
 }
