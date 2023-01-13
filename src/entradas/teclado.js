@@ -6,11 +6,11 @@ export function init() {
     document.addEventListener("keyup", teclaLevantada);
 }
 
-export function teclaPresionada(event) {
+function teclaPresionada(event) {
     teclas[event.key] = true;
 }
 
-export function teclaLevantada(event) {
+function teclaLevantada(event) {
     teclas[event.key] = false;
 }
 

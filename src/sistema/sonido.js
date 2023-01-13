@@ -2,9 +2,9 @@
 export const reboteBarra = new Audio("src/assets/sounds/rebote-barra.wav");
 export const reboteBorde = new Audio("src/assets/sounds/rebote-borde.wav");
 export const punto = new Audio("src/assets/sounds/punto.wav");
-export const gameOver = new Audio("src/assets/sounds/game-over.wav");
 export const pressBoton = new Audio("src/assets/sounds/boton.wav");
 export const iniciarJuego = new Audio("src/assets/sounds/iniciar-juego.wav");
+export const terminarJuego = new Audio("src/assets/sounds/game-over.wav");
 
 var estaSilenciado = false;
 
@@ -14,7 +14,7 @@ export function init(){
     setVolumen(reboteBarra, volumen);
     setVolumen(reboteBorde, volumen);
     setVolumen(punto, volumen);
-    setVolumen(gameOver, volumen);
+    setVolumen(terminarJuego, volumen);
     setVolumen(pressBoton, volumen);
     setVolumen(iniciarJuego, volumen);
 }

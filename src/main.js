@@ -1,24 +1,30 @@
-// Imports
+//--------------------------------------------------------------------------- 
+//                              IMPORTS
+//---------------------------------------------------------------------------
 import * as sonido from './sistema/sonido.js';
 import * as teclado from './entradas/teclado.js';
 import * as render from './sistema/render.js';
 import {barra1,barra2,pelota} from './juego/objetos.js';
+import * as barraIA from './juego/maquina.js';
 
-// Variables
+//--------------------------------------------------------------------------- 
+//                             VARIABLES
+//---------------------------------------------------------------------------
 const SEGUNDO = 1000;
-var timeDelta = 0;
-var distanciaBarras, velocidadBarras;
-var largoBarrasDefault;
-var puntajeBarra1 = 0, puntajeBarra2 = 0, metaPuntaje = 5;
-var nombreJugador1 = "Jugador 1", nombreJugador2 = "Jugador 2";
-var update, lastTick;
-var touches = [];
-var minVelocidadX, maxVelocidadX;
-var minVelocidadY, maxVelocidadY;
-var menuActual = '.menu-principal', menuAnterior = '';
-var jugandoSolo = false, multijugadorLocal = false;
+var update;
+var timeDelta = 0, lastTick;
+var distanciaBarras;    // Distancia que separa el borde de la barra
+var velocidadBarras;    // Velocidad de ambas barras
+var largoBarras;        // Largo de ambas barras por defecto
+var minVelocidadX, maxVelocidadX;   // Variación de la velocidad min y max de X al golpear con la barra
+var minVelocidadY, maxVelocidadY;   // Variación de la velocidad min y max de Y al golpear con la barra
+var puntajeBarra1 = 0, puntajeBarra2 = 0, metaPuntaje = 5;  // Variables de puntaje
+var nombreJugador1 = "Jugador 1", nombreJugador2 = "Jugador 2";    // Nombre de los jugadores
+var menuActual = '.menu-principal', menuAnterior = '';      // Variables para el botón "Regresar"
+var jugandoSolo = false, multijugadorLocal = false;         // Variables de estado
 
 // Movimiento de las barras mediante toque
+var touches = [];
 window.ontouchstart = (event) => {   
     detectarToque(event);
 }
@@ -51,6 +57,10 @@ function detectarToque(evento){
     }
 }
 
+//--------------------------------------------------------------------------- 
+//                       FUNCIÓN INCIAL DEL JUEGO
+//---------------------------------------------------------------------------
+
 function gameStart(){
     sonido.init();
     render.init();
@@ -59,6 +69,10 @@ function gameStart(){
     render.limpiar();
     render.renderizar();
 }
+
+//--------------------------------------------------------------------------- 
+//                       FUNCIÓN BUCLE DEL JUEGO
+//---------------------------------------------------------------------------
 
 function gameLoop(time){
     // ---------- Renderizar la pantalla ----------
@@ -72,15 +86,15 @@ function gameLoop(time){
     pelota.setY(pelota.getY() + ((pelota.getDireccionY() == "arriba") ? -1 : 1) * pelota.getVelocidadY() * timeDelta);
 
     // ---------- Movimieto de la Barra 1 ----------
-
     if(teclado.estaPresionando("w") || teclado.estaPresionando("W")){
         barra1.mover('arriba');
     } else if(teclado.estaPresionando("s") || teclado.estaPresionando("S")){
         barra1.mover('abajo');
     }
+
     // ---------- Movimieto de la Barra 2 ----------
     if(jugandoSolo){
-        barraIA();
+        barraIA.mover();
     } else {
         if(teclado.estaPresionando("ArrowUp")){
             barra2.mover('arriba');
@@ -91,12 +105,12 @@ function gameLoop(time){
 
     // ----- Detecta la pelota en los bordes -----
     // Borde de abajo
-    if(pelota.getY() + pelota.getRadio()/2 >= render.canvasAlto - render.grosorBorde/2){
+    if(pelota.getY() + pelota.getRadio()/2 >= render.canvasAlto - render.grosorBorde/2 && pelota.getDireccionY() === "abajo"){
         pelota.setDireccionY("arriba");
         sonido.reproducir(sonido.reboteBorde);
     }
     // Borde de arriba
-    if(pelota.getY() - pelota.getRadio()/2 <= render.grosorBorde/2){
+    if(pelota.getY() - pelota.getRadio()/2 <= render.grosorBorde/2 && pelota.getDireccionY() === "arriba"){
         pelota.setDireccionY("abajo");
         sonido.reproducir(sonido.reboteBorde);
     }
@@ -104,7 +118,8 @@ function gameLoop(time){
     if(barra1.getX() < pelota.getX()
         && barra1.getX() + barra1.getAncho() > pelota.getX() - pelota.getRadio()/2
         && pelota.getY() > barra1.getY() - barra1.getLargo()/2 - pelota.getRadio()/2
-        && pelota.getY() < barra1.getY() + barra1.getLargo()/2 + pelota.getRadio()/2){
+        && pelota.getY() < barra1.getY() + barra1.getLargo()/2 + pelota.getRadio()/2
+        && pelota.getDireccionX() === "izquierda"){
         
         pelota.setDireccionX("derecha");
         // Cambia la velocidadX de la pelota dependiendo de donde golpea con la barra 1
@@ -119,7 +134,8 @@ function gameLoop(time){
     if(barra2.getX() > pelota.getX()
         && barra2.getX() - barra2.getAncho() < pelota.getX() + pelota.getRadio()/2
         && pelota.getY() > barra2.getY() - barra2.getLargo()/2 - pelota.getRadio()/2
-        && pelota.getY() < barra2.getY() + barra2.getLargo()/2 + pelota.getRadio()/2){
+        && pelota.getY() < barra2.getY() + barra2.getLargo()/2 + pelota.getRadio()/2
+        && pelota.getDireccionX() === "derecha"){
         
         pelota.setDireccionX("izquierda");
         // Cambia la velocidadX de la pelota dependiendo de donde golpea con la barra 2
@@ -129,39 +145,70 @@ function gameLoop(time){
         sonido.reproducir(sonido.reboteBarra);
     }
 
-    // ---------- Detecta si la pelota golpea con el borde detras de las barras ----------
+    // ---------- Detecta si la pelota golpea con el borde detras de la barra 1 ----------
     if(pelota.getX() + pelota.getRadio()/2 >= render.canvasAncho - render.grosorBorde/2){
-        pelota.setX(barra1.getX() + barra1.getAncho() + pelota.getRadio()/2);
-        pelota.setY(barra1.getY());
-        
+        // Sumamos y mostramos punto para el jugador 1
         puntajeBarra1++;
         document.querySelector('.puntaje-1').textContent = puntajeBarra1;
-        
+        // Reproduce audio del punto si no se ha llegado a la meta
         if(puntajeBarra1 != metaPuntaje){
             sonido.reproducir(sonido.punto);
         }
+        // Reposicionamos la pelota
+        pelota.setX(barra1.getX() + barra1.getAncho() + pelota.getRadio()/2);
+        pelota.setY(barra1.getY());
+        // Ajustamos su velocidad a una velocidad aleatoria
+        pelota.setVelocidadX((render.canvasAncho * (numeroAleatorio(4,7) / 10)) / SEGUNDO);
+        pelota.setVelocidadY((render.canvasAncho * (numeroAleatorio(2,7) / 10)) / SEGUNDO);
     }
+    // ---------- Detecta si la pelota golpea con el borde detras de la barra 2 ----------
     if(pelota.getX() - pelota.getRadio()/2 <= render.grosorBorde/2){
-        pelota.setX(barra2.getX() - barra2.getAncho() - pelota.getRadio()/2);
-        pelota.setY(barra2.getY());
-        
+        // Sumamos y mostramos punto para el jugador 2
         puntajeBarra2++;
         document.querySelector('.puntaje-2').textContent = puntajeBarra2;
-        
+        // Reproduce audio del punto si no se ha llegado a la meta
         if(puntajeBarra2 != metaPuntaje){
             sonido.reproducir(sonido.punto);
         }
+         // Reposicionamos la pelota
+         pelota.setX(barra2.getX() - barra2.getAncho() - pelota.getRadio()/2);
+         pelota.setY(barra2.getY());
+         // Ajustamos su velocidad a una velocidad aleatoria
+         pelota.setVelocidadX((render.canvasAncho * (numeroAleatorio(4,7) / 10)) / SEGUNDO);
+         pelota.setVelocidadY((render.canvasAncho * (numeroAleatorio(2,7) / 10)) / SEGUNDO);
     }
     // ---------- Verifica si terminó el juego ----------
     if(puntajeBarra1 == metaPuntaje){
-        detenerJuego(nombreJugador1);
+        gameOver(nombreJugador1);
     } else if(puntajeBarra2 == metaPuntaje){
-        detenerJuego(nombreJugador2);
+        gameOver(nombreJugador2);
     } else {
         update = window.requestAnimationFrame(gameLoop);
     }
-    
 }
+
+//--------------------------------------------------------------------------- 
+//                       FUNCIÓN FINAL DEL JUEGO
+//---------------------------------------------------------------------------
+
+function gameOver(ganador){
+    // Terminamos el gameLoop
+    cancelAnimationFrame(update);
+    // Redefinimos valores
+    render.setJugando(false);
+    barra1.setY(render.canvasAlto/2);
+    barra2.setY(render.canvasAlto/2);
+    // Actualizamos la pantalla
+    render.limpiar();
+    render.renderizar();
+    // Mostrar ganador
+    document.querySelector('.game-over').style.display = 'flex';
+    document.querySelector('.ganador').textContent = ganador+"   gana  !";
+    // Reproducir sonido de Game Over
+    sonido.reproducir(sonido.terminarJuego);
+}
+
+/* ------------------------ FUNCIONES AUXILIARES ------------------------ */
 
 function empezar(){
     render.setJugando(true);
@@ -171,30 +218,11 @@ function empezar(){
     sonido.reproducir(sonido.iniciarJuego);
 }
 
-function barraIA(){
-    if(pelota.getDireccionX() === "derecha" && pelota.getX() > render.canvasAncho/2){
-        if(barra2.getY() < pelota.getY()){
-            if(barra2.getY() + barra2.getLargo()/2 + barra2.getVelocidad() >= render.canvasAlto - render.grosorBorde/2){
-                barra2.setY(render.canvasAlto - barra2.getLargo()/2 - render.grosorBorde/2);
-            } else {
-
-                barra2.setY(barra2.getY() + barra2.getVelocidad());
-            }
-        } else {
-            if(barra2.getY() - barra2.getLargo()/2 - barra2.getVelocidad() <= render.grosorBorde/2){
-                barra2.setY(barra2.getLargo()/2 + render.grosorBorde/2);
-            } else {
-                barra2.setY(barra2.getY() - barra2.getVelocidad());
-            }
-        }
-    }
-}
-
 function setValoresIniciales(){
     // Establecer variables
     distanciaBarras = 40;
     velocidadBarras = render.canvasAlto * 20 / SEGUNDO;
-    largoBarrasDefault = render.canvasAlto/6;
+    largoBarras = render.canvasAlto/6;
     puntajeBarra1 = 0, puntajeBarra2 = 0;
     timeDelta = 0; lastTick = 0; render.setJugando(false);
     minVelocidadX = render.canvasAncho * 0.4 / SEGUNDO; maxVelocidadX = render.canvasAncho * 0.7 / SEGUNDO;
@@ -204,14 +232,14 @@ function setValoresIniciales(){
     // --- Barra 1 ---
     barra1.setX(distanciaBarras);
     barra1.setY(render.canvasAlto/2);
-    barra1.setLargo(largoBarrasDefault);
+    barra1.setLargo(largoBarras);
     barra1.setAncho(render.grosorBorde);
     barra1.setColor("white");
     barra1.setVelocidad(velocidadBarras);
     // --- Barra 2 ---
     barra2.setX(render.canvasAncho - distanciaBarras);
     barra2.setY(render.canvasAlto/2);
-    barra2.setLargo(largoBarrasDefault);
+    barra2.setLargo(largoBarras);
     barra2.setAncho(render.grosorBorde);
     barra2.setColor("white");
     barra2.setVelocidad(velocidadBarras);
@@ -232,16 +260,8 @@ function setValoresIniciales(){
     }
 }
 
-function detenerJuego(ganador){
-    cancelAnimationFrame(update);
-    render.setJugando(false);
-    render.limpiar();
-    render.renderizar();
-    // Mostrar ganador
-    document.querySelector('.game-over').style.display = 'flex';
-    document.querySelector('.ganador').textContent = ganador+"   gana  !";
-    // Reproducir sonido de Game Over
-    sonido.reproducir(sonido.gameOver);
+export function numeroAleatorio(min, max) {
+    return Math.round(Math.random() * (max - min) + min);
 }
 
 /* ------------------ FUNCIONES DEL MENU DEL JUEGO ------------------ */
@@ -285,18 +305,11 @@ function pantallaCompleta(){
     sonido.reproducir(sonido.pressBoton);
 }
 
-
-function regresar(){
-    document.querySelector(menuAnterior).style.display = 'block';
-    document.querySelector(menuActual).style.display = 'none';
-    menuActual = menuAnterior;
-    menuAnterior = '';
-    sonido.reproducir(sonido.pressBoton);
-}
-
 function reintentar(){
     setValoresIniciales();
     render.setJugando(true);
+    document.querySelector('.puntaje-1').textContent = puntajeBarra1;
+    document.querySelector('.puntaje-2').textContent = puntajeBarra2;
     document.querySelector('.game-over').style.display = 'none';
     document.querySelector('.puntaje').style.display = 'flex';
     sonido.reproducir(sonido.iniciarJuego);
@@ -311,10 +324,12 @@ function salir(){
     sonido.reproducir(sonido.pressBoton);
 }
 
-/* ------------------------- FUNCIONES AUXILIARES -------------------------- */
-
-function numeroAleatorio(min, max) {
-    return Math.round(Math.random() * (max - min) + min);
+function regresar(){
+    document.querySelector(menuAnterior).style.display = 'block';
+    document.querySelector(menuActual).style.display = 'none';
+    menuActual = menuAnterior;
+    menuAnterior = '';
+    sonido.reproducir(sonido.pressBoton);
 }
 
 /* ------------ FUNCIONES CUANDO LA PANTALLA CARGA O SE REDIMENSIONA ------------- */
@@ -337,6 +352,9 @@ window.addEventListener('resize', () => {
         document.querySelector('.puntaje').style.display = 'none';
         document.querySelector('.aviso-girar-pantalla').style.display = 'none';
         document.querySelector('.interfaz').style.display = 'flex';
+        if (!document.fullscreenElement) {
+            document.querySelector('.screen').classList.remove('checked');
+        }
         render.init();
         setValoresIniciales();
         render.renderizar();
