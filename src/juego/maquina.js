@@ -1,25 +1,62 @@
 import { numeroAleatorio } from '../main.js';
-import { canvasAlto,canvasAncho,grosorBorde } from '../sistema/render.js';
-import { barra2,pelota } from '../juego/objetos.js';
+import { canvasAncho } from '../sistema/render.js';
+import { barra1,barra2,pelota } from '../juego/objetos.js';
 
-var dificultad;
+var dificultadBarra1 = 0, dificultadBarra2 = 0;
+export var sinDificultad = false;
 
-export function mover(){
-    if(pelota.getDireccionX() === "derecha" && pelota.getX() < canvasAncho/2){
-        dificultad = numeroAleatorio(0,3) * 10;
+export function moverBarra2(){
+
+    if(pelota.getX() < canvasAncho * 0.51 && !sinDificultad){
+        dificultadBarra2 = numeroAleatorio(0,4) * barra2.getLargo()/4;
     }
+
     if(pelota.getDireccionX() === "derecha" && pelota.getX() > canvasAncho/2){
-        if(pelota.getY() > barra2.getY() + barra2.getLargo()/2 + pelota.getRadio()/2 + dificultad){
-            if(barra2.getY() + barra2.getLargo()/2 + barra2.getVelocidad() >= canvasAlto - grosorBorde/2){
-                barra2.setY(canvasAlto - barra2.getLargo()/2 - grosorBorde/2);
-            } else {
-                barra2.setY(barra2.getY() + barra2.getVelocidad());
+
+        if(pelota.getDireccionY() === "arriba"){
+            if(predecirPelotaEnY() > barra2.getY() + barra2.getLargo()/2 + dificultadBarra2){
+                barra2.mover('abajo');
+            } else if(predecirPelotaEnY() < barra2.getY() - barra2.getLargo()/2 - dificultadBarra2){
+                barra2.mover('arriba');
             }
-        } else if(pelota.getY() <= barra2.getY() - barra2.getLargo()/2 - pelota.getRadio()/2 - dificultad){
-            if(barra2.getY() - barra2.getLargo()/2 - barra2.getVelocidad() <= grosorBorde/2){
-                barra2.setY(barra2.getLargo()/2 + grosorBorde/2);
-            } else {
-                barra2.setY(barra2.getY() - barra2.getVelocidad());
+        } else {
+            if(predecirPelotaEnY() > barra2.getY() + barra2.getLargo()/2 + dificultadBarra2){
+                barra2.mover('abajo');
+            } else if(predecirPelotaEnY() < barra2.getY() - barra2.getLargo()/2 - dificultadBarra2){
+                barra2.mover('arriba');
+            }
+        }
+    }
+
+    // Por diversión
+    //moverBarra1();
+}
+
+function predecirPelotaEnY(){
+    let vecesX = pelota.getDireccionX() === "derecha" ? (canvasAncho - pelota.getX())/pelota.getVelocidadX() : pelota.getX()/pelota.getVelocidadX();
+    let distanciaY = pelota.getVelocidadY() * vecesX;
+    let posY = pelota.getDireccionY() === "arriba" ? pelota.getY() - distanciaY : pelota.getY() + distanciaY;
+    return posY;
+}
+
+function moverBarra1(){
+    if(pelota.getX() > canvasAncho * 0.51 && !sinDificultad){
+        dificultadBarra1 = numeroAleatorio(0,4) * barra1.getLargo()/4;
+    }
+
+    if(pelota.getDireccionX() === "izquierda" && pelota.getX() < canvasAncho/2){
+        
+        if(pelota.getDireccionY() === "arriba"){
+            if(predecirPelotaEnY() > barra1.getY() + barra1.getLargo()/2 + dificultadBarra1){
+                barra1.mover('abajo');
+            } else if(predecirPelotaEnY() < barra1.getY() - barra1.getLargo()/2 - dificultadBarra1){
+                barra1.mover('arriba');
+            }
+        } else {
+            if(predecirPelotaEnY() > barra1.getY() + barra1.getLargo()/2 + dificultadBarra1){
+                barra1.mover('abajo');
+            } else if(predecirPelotaEnY() < barra1.getY() - barra1.getLargo()/2 - dificultadBarra1){
+                barra1.mover('arriba');
             }
         }
     }

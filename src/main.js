@@ -11,7 +11,7 @@ import * as barraIA from './juego/maquina.js';
 //                             VARIABLES
 //---------------------------------------------------------------------------
 const SEGUNDO = 1000;
-var update;
+var update, guia, estaMostrandoGuia = false;
 var timeDelta = 0, lastTick;
 var distanciaBarras;    // Distancia que separa el borde de la barra
 var velocidadBarras;    // Velocidad de ambas barras
@@ -21,7 +21,7 @@ var minVelocidadY, maxVelocidadY;   // Variación de la velocidad min y max de Y
 var puntajeBarra1 = 0, puntajeBarra2 = 0, metaPuntaje = 5;  // Variables de puntaje
 var nombreJugador1 = "Jugador 1", nombreJugador2 = "Jugador 2";    // Nombre de los jugadores
 var menuActual = '.menu-principal', menuAnterior = '';      // Variables para el botón "Regresar"
-var jugandoSolo = false, multijugadorLocal = false;         // Variables de estado
+var jugandoSolo = false;         // Variables de estado
 
 // Movimiento de las barras mediante toque
 var touches = [];
@@ -94,7 +94,7 @@ function gameLoop(time){
 
     // ---------- Movimieto de la Barra 2 ----------
     if(jugandoSolo){
-        barraIA.mover();
+        barraIA.moverBarra2();
     } else {
         if(teclado.estaPresionando("ArrowUp")){
             barra2.mover('arriba');
@@ -220,10 +220,13 @@ function empezar(){
 
 function setValoresIniciales(){
     // Establecer variables
+    estaMostrandoGuia = false;
     distanciaBarras = 40;
     velocidadBarras = render.canvasAlto * 20 / SEGUNDO;
     largoBarras = render.canvasAlto/6;
     puntajeBarra1 = 0, puntajeBarra2 = 0;
+    document.querySelector('.puntaje-1').textContent = puntajeBarra1;
+    document.querySelector('.puntaje-2').textContent = puntajeBarra2;
     timeDelta = 0; lastTick = 0; render.setJugando(false);
     minVelocidadX = render.canvasAncho * 0.4 / SEGUNDO; maxVelocidadX = render.canvasAncho * 0.7 / SEGUNDO;
     minVelocidadY = render.canvasAncho * 0.2 / SEGUNDO; maxVelocidadY = render.canvasAncho * 0.7 / SEGUNDO;
@@ -265,17 +268,28 @@ export function numeroAleatorio(min, max) {
 }
 
 /* ------------------ FUNCIONES DEL MENU DEL JUEGO ------------------ */
+var iconosRedesSociales = document.querySelectorAll('.icon');
+iconosRedesSociales.forEach(function(botonRS) {
+    botonRS.addEventListener('click', sonarRedSocial);
+});
 
 document.querySelector('.boton-un-jugador').addEventListener('click', unJugador);
 document.querySelector('.boton-multijugador').addEventListener('click', multijugador);
+document.querySelector('.boton-como-jugar').addEventListener('click', comoJugar);
 document.querySelector('.boton-opciones').addEventListener('click', mostrarOpciones);
+
+document.querySelector('.boton-local').addEventListener('click', multijugadorLocal);
+document.querySelector('.boton-online').addEventListener('click', multijugadorOnline);
 
 document.querySelector('.boton-pantalla-completa').addEventListener('click', pantallaCompleta);
 
 document.querySelector('.boton-reintentar').addEventListener('click', reintentar);
 document.querySelector('.boton-salir').addEventListener('click', salir);
 
-document.querySelector('.boton-regresar').addEventListener('click', regresar);
+var botonesRegresar = document.querySelectorAll('.boton-regresar');
+botonesRegresar.forEach(function(boton) {
+  boton.addEventListener('click', regresar);
+});
 
 function unJugador(){
     jugandoSolo = true;
@@ -283,15 +297,49 @@ function unJugador(){
 }
 
 function multijugador(){
+    mostrarMenu('.menu-multijugador');
+    sonido.reproducir(sonido.pressBoton);
+}
+
+function multijugadorOnline(){
+    alert('No diponible aún.');
+}
+
+function multijugadorLocal(){
     jugandoSolo = false;
     empezar();
 }
 
+function comoJugar(){
+    mostrarMenu('.menu-como-jugar');
+    sonido.reproducir(sonido.pressBoton);
+    guia = window.requestAnimationFrame(movimientoGuia);
+    estaMostrandoGuia = true;
+}
+
+function movimientoGuia(){
+    // Renderizamos
+    render.limpiar();
+    render.renderizar();
+    // Para pantallas largas
+    if(teclado.estaPresionando("w") || teclado.estaPresionando("W")){
+        barra1.mover('arriba');
+    } else if(teclado.estaPresionando("s") || teclado.estaPresionando("S")){
+        barra1.mover('abajo');
+    }
+    if(teclado.estaPresionando("ArrowUp")){
+        barra2.mover('arriba');
+    } else if(teclado.estaPresionando("ArrowDown")){
+        barra2.mover('abajo');
+    }
+    // Para moviles
+
+    // Llamamos a otro frame
+    guia = window.requestAnimationFrame(movimientoGuia);
+}
+
 function mostrarOpciones(){
-    menuAnterior = menuActual;
-    menuActual = '.menu-opciones';
-    document.querySelector(menuAnterior).style.display = 'none';
-    document.querySelector(menuActual).style.display = 'block';
+    mostrarMenu('.menu-opciones');
     sonido.reproducir(sonido.pressBoton);
 }
 
@@ -307,28 +355,49 @@ function pantallaCompleta(){
 
 function reintentar(){
     setValoresIniciales();
-    render.setJugando(true);
-    document.querySelector('.puntaje-1').textContent = puntajeBarra1;
-    document.querySelector('.puntaje-2').textContent = puntajeBarra2;
     document.querySelector('.game-over').style.display = 'none';
-    document.querySelector('.puntaje').style.display = 'flex';
-    sonido.reproducir(sonido.iniciarJuego);
-    update = window.requestAnimationFrame(gameLoop);
+    empezar();
 }
 
 function salir(){
     setValoresIniciales();
+    menuActual.classList.remove('active');
+    document.querySelector('.menu-principal').classList.add('active');
+    menuActual = document.querySelector('.menu-principal');
     document.querySelector('.puntaje').style.display = 'none';
     document.querySelector('.game-over').style.display = 'none';
     document.querySelector('.interfaz').style.display = 'flex';
+
     sonido.reproducir(sonido.pressBoton);
 }
 
 function regresar(){
-    document.querySelector(menuAnterior).style.display = 'block';
-    document.querySelector(menuActual).style.display = 'none';
-    menuActual = menuAnterior;
-    menuAnterior = '';
+    sonido.reproducir(sonido.pressBoton);
+    // Obtener el menú actual y el menú anterior
+    menuActual = document.querySelector('.menu.active');
+    // Ocultar el menú actual
+    menuActual.classList.remove('active');
+    // Mostrar el menú anterior
+    menuAnterior.classList.add('active');
+    // Cancelamos la muestra, reestablecemos valores de las barra y renderizamos
+    if(estaMostrandoGuia){
+        cancelAnimationFrame(guia);
+        barra1.setY(render.canvasAlto/2);
+        barra2.setY(render.canvasAlto/2);
+        estaMostrandoGuia = false;
+        render.limpiar();
+        render.renderizar();
+    }
+}
+
+function mostrarMenu(menuClase){
+    menuActual = document.querySelector(menuClase);
+    menuAnterior = document.querySelector('.active');
+    menuAnterior.classList.remove('active');
+    menuActual.classList.add('active');
+}
+
+function sonarRedSocial(){
     sonido.reproducir(sonido.pressBoton);
 }
 
@@ -342,6 +411,13 @@ window.addEventListener("load",() => {
         document.querySelector('.aviso-girar-pantalla').style.display = 'none';
         document.querySelector('.interfaz').style.display = 'flex';
         document.fonts.ready.then(gameStart);
+    }
+    if(window.innerWidth < 990){
+        document.querySelector('.contenedor-guia-desktop').classList.remove('guia-activa');
+        document.querySelector('.contenedor-guia-movil').classList.add('guia-activa');
+    } else {
+        document.querySelector('.contenedor-guia-movil').classList.remove('guia-activa');
+        document.querySelector('.contenedor-guia-desktop').classList.add('guia-activa');
     }
 });
 

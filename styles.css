@@ -57,7 +57,7 @@ main {
     justify-content: space-between;
     z-index: 10;
     color: white;
-    width: 50%;
+    width: 80%;
     height: 75%;
 }
 
@@ -89,8 +89,8 @@ main {
 }
 
 .ganador{
-    margin-bottom: 80px;
-    font-size: 50px;
+    margin-bottom: 5%;
+    font-size: 35px;
 }
 
 .aviso-girar-pantalla{
@@ -115,12 +115,59 @@ main {
     height: auto;
 }
 
-.menu-principal{
+.menu-principal,.menu-multijugador,.menu-como-jugar,.menu-opciones{
+    display: none;
+}
+
+.active{
     display: block;
 }
 
-.menu-opciones{
+.contenedor-guia-desktop,.contenedor-guia-movil{
     display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.guia-activa{
+    display: flex;
+}
+
+.contenedor-guia-desktop > .boton-regresar,.contenedor-guia-movil > .boton-regresar {
+    margin: 0;
+}
+
+.guia-un-jugador,.guia-multijugador-local{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 3.5%;
+}
+
+.contenedor-guia-desktop .guia-un-jugador,.contenedor-guia-desktop .guia-multijugador-local{
+    width: 50px;
+    height: 250px;
+    margin-bottom: 3.5%;
+}
+
+.contenedor-guia-movil .guia-un-jugador,.contenedor-guia-movil .guia-multijugador-local{
+    width: 50px;
+    height: 70%;
+    margin-bottom: 2.5%;
+}
+
+.guia-un-jugador{
+    left: 0;
+}
+
+.guia-multijugador-local{
+    right: 0;
+}
+
+div.icon-guia{
+    font-size: 50px;
 }
 
 .boton{
@@ -228,6 +275,12 @@ footer {
     .game-over{
         font-size: 30px;
     }
+
+    .ganador{
+        margin-bottom: 80px;
+        font-size: 50px;
+    }
+    
     
     .titulo-ping-pong{
         font-size: 65px;

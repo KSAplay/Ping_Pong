@@ -29,10 +29,42 @@
                     <span>PING&nbsp;&nbsp;&nbsp;PONG</span>
                 </div>
 
-                <div class="menu menu-principal">
+                <div class="menu menu-principal active">
                     <div class="boton boton-un-jugador"><p>UN JUGADOR</p></div>
                     <div class="boton boton-multijugador"><p>MULTIJUGADOR</div>
+                        <div class="boton boton-como-jugar"><p>COMO&nbsp;&nbsp;&nbsp;JUGAR</div>
                     <div class="boton boton-opciones"><p>OPCIONES</p></div>
+                </div>
+
+                <div class="menu menu-multijugador">
+                    <div class="boton boton-local"><p>LOCAL</p></div>
+                    <div class="boton boton-online"><p>ONLINE</div>
+                    <div class="boton boton-regresar"><p>REGRESAR</p></div>
+                </div>
+
+                <div class="menu menu-como-jugar">
+                    <div class="contenedor-guia-desktop">
+                        <div class="guia-un-jugador">
+                            <div class="icon-guia w">W</div>
+                            <div class="icon-guia s">S</div>
+                        </div>
+                        <div class="boton boton-regresar"><p>REGRESAR</p></div>
+                        <div class="guia-multijugador-local">
+                            <div class="icon-guia arrow-up">&#x1F829;</div>
+                            <div class="icon-guia arrow-down">&#x1F82B;	</div>
+                        </div>
+                    </div>
+                    <div class="contenedor-guia-movil">
+                        <div class="guia-un-jugador">
+                            <i class="fa-solid fa-arrow-up-long"></i>
+                            <i class="fa-solid fa-arrow-down-long"></i>
+                        </div>
+                        <div class="boton boton-regresar"><p>REGRESAR</p></div>
+                        <div class="guia-multijugador-local">
+                            <i class="fa-solid fa-arrow-up-long"></i>
+                            <i class="fa-solid fa-arrow-down-long"></i>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="menu menu-opciones">
@@ -51,13 +83,16 @@
             </div>
 
             <div class="game-over">
+                <div class="puntaje-final">
+                    <span class="puntaje-final-1">0</span>
+                    <span class="puntaje-final-2">0</span>
+                </div>
                 <span class="ganador"></span>
                 <div class="boton boton-reintentar"><p>REINTENTAR</p></div>
                 <div class="boton boton-salir"><p>SALIR</p></div>
             </div>
         </main>
         <script src="https://kit.fontawesome.com/7b9f8c27b2.js" crossorigin="anonymous"></script>
-        <!-- <script src="src/main.js"></script> -->
         <script src="src/main.js" type="module"></script>
     </body>
 </html>
