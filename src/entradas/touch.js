@@ -1,38 +1,38 @@
+import { barra1, barra2 } from "../juego/objetos.js";
+import { canvasAncho } from "../sistema/render,js";
 
-import {estaJugando} from '../sistema/render.js';
-
-const touchPositions = {};
-let touchPaddle;
+// Variables para almacenar la posición inicial del dedo del jugador
+let posBarra1X, posBarra2X;
+let aux;
+export var posBarra1Y = -1,
+  posBarra2Y = -1;
+export var moverBarra = false;
 
 export function init() {
-    document.addEventListener("touchstart", handleTouchStart);
-    document.addEventListener("touchmove", handleTouchMove);
-    document.addEventListener("touchend", handleTouchEnd);
+  // Asignar eventos touchstart y touchmove al canvas del juego
+  canvas.addEventListener("touchstart", touchStart);
+  canvas.addEventListener("touchmove", touchMove);
 }
 
-//Función para manejar el evento touchstart
-function handleTouchStart(event) {
-    event.preventDefault();
-    touchPositions.initialX = event.touches[0].clientX;
-    touchPositions.initialY = event.touches[0].clientY;
-    if(event.touches.length > 1){
-        touchPositions.initialX = event.touches[1].clientX;
-        touchPositions.initialY = event.touches[1].clientY;
-    }
+function touchStart(event) {
+  let posToque = event.touches[0].clientX;
+  if (posToque < canvasAncho / 2) {
+    aux = "barra1";
+    posBarra1X = event.touches[0].clientX;
+    posBarra2X = event.touches[1].clientX;
+  } else {
+    aux = "barra2";
+    posBarra1X = event.touches[1].clientX;
+    posBarra2X = event.touches[0].clientX;
+  }
 }
 
-//Función para manejar el evento touchmove
-function handleTouchMove(event) {
-    event.preventDefault();
-    touchPositions.currentX = event.touches[0].clientX;
-    touchPositions.currentY = event.touches[0].clientY;
-    touchPaddle += touchPositions.currentY - touchPositions.initialY;
-    touchPositions.initialX = touchPositions.currentX;
-    touchPositions.initialY = touchPositions.currentY;
-}
-
-//Función para manejar el evento touchend
-function handleTouchEnd(event) {
-    event.preventDefault();
-    touchPaddle = null;
+function touchMove(event) {
+  if (aux == "barra1") {
+    posBarra1Y = event.touches[0].clientY;
+    posBarra2Y = event.touches[1].clientY;
+  } else {
+    posBarra1Y = event.touches[1].clientY;
+    posBarra2Y = event.touches[0].clientY;
+  }
 }

@@ -1,98 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-        <link rel="preload" as="font" href="https://fonts.cdnfonts.com/s/6071/ARCADECLASSIC.woff" type="font/woff" crossorigin>
-        <link rel="preload" as="style" href="styles.css">
-        <link rel="stylesheet" type="text/css" href="styles.css">
-        <link rel="icon" type="image/x-icon" href="src/assets/images/favicon.png">
-        <title>Ping Pong</title>
-    </head>
-    <body>
-        <main>
-            <canvas id="mesa" draggable="false"></canvas>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link
+      rel="preload"
+      as="font"
+      href="https://fonts.cdnfonts.com/s/6071/ARCADECLASSIC.woff"
+      type="font/woff"
+      crossorigin
+    />
+    <link rel="preload" as="style" href="styles.css" />
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <link rel="icon" type="image/x-icon" href="src/assets/images/favicon.png" />
+    <title>Ping Pong</title>
+  </head>
+  <body>
+    <main>
+      <canvas id="mesa" draggable="false"></canvas>
 
-            <div class="aviso-girar-pantalla">
-                <p>Gira&nbsp;&nbsp;&nbsp;la&nbsp;&nbsp;&nbsp;pantalla<br>por&nbsp;&nbsp;&nbsp;favor</p>
+      <div class="aviso-girar-pantalla">
+        <p>
+          Gira&nbsp;&nbsp;&nbsp;la&nbsp;&nbsp;&nbsp;pantalla<br />por&nbsp;&nbsp;&nbsp;favor
+        </p>
+      </div>
+
+      <div class="puntaje-jugando">
+        <span class="puntaje-1">0</span>
+        <span class="puntaje-2">0</span>
+      </div>
+
+      <div class="interfaz">
+        <div class="titulo-ping-pong">
+          <span>PING&nbsp;&nbsp;&nbsp;PONG</span>
+        </div>
+
+        <div class="menu menu-principal active">
+          <div class="boton boton-un-jugador"><p>JUGAR</p></div>
+          <div class="boton boton-multijugador"><p>MULTIJUGADOR</p></div>
+          <div class="boton boton-como-jugar">
+            <p>COMO&nbsp;&nbsp;&nbsp;JUGAR</p>
+          </div>
+          <div class="boton boton-opciones"><p>OPCIONES</p></div>
+        </div>
+
+        <div class="menu menu-multijugador">
+          <div class="boton boton-local"><p>LOCAL</p></div>
+          <div class="boton boton-online"><p>ONLINE</p></div>
+          <div class="boton boton-regresar"><p>REGRESAR</p></div>
+        </div>
+
+        <div class="menu menu-como-jugar">
+          <div class="contenedor-guia-desktop">
+            <div class="guia-un-jugador">
+              <div class="icon-guia w">W</div>
+              <div class="icon-guia s">S</div>
             </div>
-
-            <div class="puntaje">
-                <span class="puntaje-1">0</span>
-                <span class="puntaje-2">0</span>
+            <div class="boton boton-regresar"><p>REGRESAR</p></div>
+            <div class="guia-multijugador-local">
+              <div class="icon-guia arrow-up">&#x1F829;</div>
+              <div class="icon-guia arrow-down">&#x1F82B;</div>
             </div>
-
-            <div class="interfaz">
-
-                <div class="titulo-ping-pong">
-                    <span>PING&nbsp;&nbsp;&nbsp;PONG</span>
-                </div>
-
-                <div class="menu menu-principal active">
-                    <div class="boton boton-un-jugador"><p>UN JUGADOR</p></div>
-                    <div class="boton boton-multijugador"><p>MULTIJUGADOR</div>
-                        <div class="boton boton-como-jugar"><p>COMO&nbsp;&nbsp;&nbsp;JUGAR</div>
-                    <div class="boton boton-opciones"><p>OPCIONES</p></div>
-                </div>
-
-                <div class="menu menu-multijugador">
-                    <div class="boton boton-local"><p>LOCAL</p></div>
-                    <div class="boton boton-online"><p>ONLINE</div>
-                    <div class="boton boton-regresar"><p>REGRESAR</p></div>
-                </div>
-
-                <div class="menu menu-como-jugar">
-                    <div class="contenedor-guia-desktop">
-                        <div class="guia-un-jugador">
-                            <div class="icon-guia w">W</div>
-                            <div class="icon-guia s">S</div>
-                        </div>
-                        <div class="boton boton-regresar"><p>REGRESAR</p></div>
-                        <div class="guia-multijugador-local">
-                            <div class="icon-guia arrow-up">&#x1F829;</div>
-                            <div class="icon-guia arrow-down">&#x1F82B;	</div>
-                        </div>
-                    </div>
-                    <div class="contenedor-guia-movil">
-                        <div class="guia-un-jugador">
-                            <i class="fa-solid fa-arrow-up-long"></i>
-                            <i class="fa-solid fa-arrow-down-long"></i>
-                        </div>
-                        <div class="boton boton-regresar"><p>REGRESAR</p></div>
-                        <div class="guia-multijugador-local">
-                            <i class="fa-solid fa-arrow-up-long"></i>
-                            <i class="fa-solid fa-arrow-down-long"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="menu menu-opciones">
-                    <div class="boton boton-pantalla-completa"><p>PANTALLA&nbsp;&nbsp;&nbsp;COMPLETA<span class="checkbox screen"></span></p></div>
-                    <div class="boton boton-silenciar"><p>SILENCIAR<span class="checkbox mute"></span></p></div>
-                    <div class="boton boton-regresar"><p>REGRESAR</p></div>
-                </div>
-
-                <footer>
-                    <span>&copy; 2023 - Made by Kenny</span>
-                    <div class="icons">
-                        <a class="icon" rel="noopener" href="https://github.com/KSAplay" target="_blank"><i class="fa-brands fa-github"></i></a>
-                        <a class="icon" rel="noopener" href="https://www.linkedin.com/in/kenny-saavedra-altuna/" target="_blank"><i class="fa-brands fa-linkedin"></i></a>
-                    </div>
-                </footer>
+          </div>
+          <div class="contenedor-guia-movil">
+            <div class="guia-un-jugador">
+              <i class="fa-solid fa-arrow-up-long"></i>
+              <i class="fa-solid fa-arrow-down-long"></i>
             </div>
-
-            <div class="game-over">
-                <div class="puntaje-final">
-                    <span class="puntaje-final-1">0</span>
-                    <span class="puntaje-final-2">0</span>
-                </div>
-                <span class="ganador"></span>
-                <div class="boton boton-reintentar"><p>REINTENTAR</p></div>
-                <div class="boton boton-salir"><p>SALIR</p></div>
+            <div class="boton boton-regresar"><p>REGRESAR</p></div>
+            <div class="guia-multijugador-local">
+              <i class="fa-solid fa-arrow-up-long"></i>
+              <i class="fa-solid fa-arrow-down-long"></i>
             </div>
-        </main>
-        <script src="https://kit.fontawesome.com/7b9f8c27b2.js" crossorigin="anonymous"></script>
-        <script src="src/main.js" type="module"></script>
-    </body>
+          </div>
+        </div>
+
+        <div class="menu menu-opciones">
+          <div class="boton boton-pantalla-completa">
+            <p>
+              PANTALLA&nbsp;&nbsp;&nbsp;COMPLETA<span
+                class="checkbox screen"
+              ></span>
+            </p>
+          </div>
+          <div class="boton boton-silenciar">
+            <p>SILENCIAR<span class="checkbox mute"></span></p>
+          </div>
+          <div class="boton boton-regresar"><p>REGRESAR</p></div>
+        </div>
+
+        <footer>
+          <span>&copy; 2023 - Made by Kenny</span>
+          <div class="icons">
+            <a
+              class="icon"
+              rel="noopener"
+              href="https://github.com/KSAplay"
+              target="_blank"
+              ><i class="fa-brands fa-github"></i
+            ></a>
+            <a
+              class="icon"
+              rel="noopener"
+              href="https://www.linkedin.com/in/kenny-saavedra-altuna/"
+              target="_blank"
+              ><i class="fa-brands fa-linkedin"></i
+            ></a>
+          </div>
+        </footer>
+      </div>
+
+      <div class="game-over">
+        <div class="puntaje-final">
+          <span class="puntaje-final-1">0</span>
+          <span class="puntaje-final-2">0</span>
+        </div>
+        <span class="ganador"></span>
+        <div class="boton boton-reintentar"><p>REINTENTAR</p></div>
+        <div class="boton boton-salir"><p>SALIR</p></div>
+      </div>
+    </main>
+    <script
+      src="https://kit.fontawesome.com/7b9f8c27b2.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="src/main.js" type="module"></script>
+  </body>
 </html>

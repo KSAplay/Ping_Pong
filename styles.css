@@ -1,360 +1,389 @@
-@font-face {
-    font-family: 'ArcadeClassic';
-    font-style: normal;
-    font-weight: 400;
-    src: local('ArcadeClassic'), url('https://fonts.cdnfonts.com/s/6071/ARCADECLASSIC.woff') format('woff');
+/* @font-face {
+  font-family: "ArcadeClassic";
+  font-style: normal;
+  font-weight: 400;
+  src: local("ArcadeClassic"),
+    url("https://fonts.cdnfonts.com/s/6071/ARCADECLASSIC.woff") format("woff");
+} */
+
+p {
+  margin: 0;
 }
 
-p{
-    margin: 0;
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  background-color: black;
+  font-family: "ArcadeClassic";
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
-html, body{
-    height: 100%;
-    overflow: hidden;
-    background-color: black;
-    font-family: 'ArcadeClassic';
-    -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -khtml-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-}
-
-canvas#mesa{
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: black;
-    -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -khtml-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        outline: none;
-        -webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
+canvas#mesa {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: black;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: none;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
 }
 
 main {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.interfaz{
-    position: absolute;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    z-index: 10;
-    color: white;
-    width: 80%;
-    height: 75%;
+.interfaz {
+  position: absolute;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  color: white;
+  width: 80%;
+  height: 75%;
 }
 
-.puntaje{
-    position: absolute;
-    display: none;
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: center;
-    font-size: 30px;
-    z-index: 10;
-    color: white;
-    width: 50%;
-    height: 75%;
-    gap: 100px;
+.puntaje-jugando {
+  position: absolute;
+  display: none;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  font-size: 30px;
+  z-index: 10;
+  color: white;
+  width: 50%;
+  height: 75%;
+  gap: 100px;
 }
 
-.game-over{
-    position: absolute;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    font-size: 20px;
-    color: white;
-    width: 50%;
-    height: 75%;
+.game-over {
+  position: absolute;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  font-size: 20px;
+  color: white;
+  width: 60%;
+  height: 75%;
 }
 
-.ganador{
-    margin-bottom: 5%;
-    font-size: 35px;
+.ganador {
+  margin-bottom: 5%;
+  font-size: 35px;
 }
 
-.aviso-girar-pantalla{
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    z-index: 10;
-    text-align: center;
-    font-size: 20px;
-    color: white;
+.puntaje-final {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 95%;
+  height: 30%;
+  font-size: 40px;
+  z-index: -1;
 }
 
-.titulo-ping-pong{
-    font-size: 45px;
+.puntaje-final-1 {
+  text-align: left;
 }
 
-.menu{
-    text-align: center;
-    font-size: 20px;
-    height: auto;
+.puntaje-final-2 {
+  text-align: right;
 }
 
-.menu-principal,.menu-multijugador,.menu-como-jugar,.menu-opciones{
-    display: none;
+.aviso-girar-pantalla {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  z-index: 10;
+  text-align: center;
+  font-size: 20px;
+  color: white;
 }
 
-.active{
-    display: block;
+.titulo-ping-pong {
+  font-size: 45px;
 }
 
-.contenedor-guia-desktop,.contenedor-guia-movil{
-    display: none;
-    align-items: center;
-    justify-content: center;
+.menu {
+  text-align: center;
+  font-size: 20px;
+  height: auto;
 }
 
-.guia-activa{
-    display: flex;
+.menu-principal,
+.menu-multijugador,
+.menu-como-jugar,
+.menu-opciones {
+  display: none;
 }
 
-.contenedor-guia-desktop > .boton-regresar,.contenedor-guia-movil > .boton-regresar {
-    margin: 0;
+.active {
+  display: block;
 }
 
-.guia-un-jugador,.guia-multijugador-local{
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 3.5%;
+.contenedor-guia-desktop,
+.contenedor-guia-movil {
+  display: none;
+  align-items: center;
+  justify-content: center;
 }
 
-.contenedor-guia-desktop .guia-un-jugador,.contenedor-guia-desktop .guia-multijugador-local{
-    width: 50px;
-    height: 250px;
-    margin-bottom: 3.5%;
+.guia-activa {
+  display: flex;
 }
 
-.contenedor-guia-movil .guia-un-jugador,.contenedor-guia-movil .guia-multijugador-local{
-    width: 50px;
-    height: 70%;
-    margin-bottom: 2.5%;
+.contenedor-guia-desktop > .boton-regresar,
+.contenedor-guia-movil > .boton-regresar {
+  margin: 0;
 }
 
-.guia-un-jugador{
-    left: 0;
+.guia-un-jugador,
+.guia-multijugador-local {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3.5%;
 }
 
-.guia-multijugador-local{
-    right: 0;
+.contenedor-guia-desktop .guia-un-jugador,
+.contenedor-guia-desktop .guia-multijugador-local {
+  width: 50px;
+  height: 250px;
+  margin-bottom: 3.5%;
 }
 
-div.icon-guia{
-    font-size: 50px;
+.contenedor-guia-movil .guia-un-jugador,
+.contenedor-guia-movil .guia-multijugador-local {
+  width: 50px;
+  height: 70%;
+  margin-bottom: 2.5%;
 }
 
-.boton{
-    margin: 13px 0;
-    transition: .2s;
+.guia-un-jugador {
+  left: 0;
 }
 
-.boton-regresar{
-    margin-top: 40px;
+.guia-multijugador-local {
+  right: 0;
 }
 
-.boton:active{
-    transform: scale(0.92);
+div.icon-guia {
+  font-size: 50px;
 }
 
-span.checkbox{
-    position: absolute;
-    color: white;
-    font-weight: bold;
-    margin-left: 10px;
+.boton {
+  margin: 13px 0;
+  transition: 0.2s;
+}
+
+.boton-regresar {
+  margin-top: 40px;
+}
+
+.boton:active {
+  transform: scale(0.92);
+}
+
+span.checkbox {
+  position: absolute;
+  color: white;
+  font-weight: bold;
+  margin-left: 10px;
 }
 
 span.checkbox::after {
-    position: absolute;
-    content: '';
-    font-weight: lighter;
-    border: 2.5px solid white;
-    width: 14px;
-    height: 14px;
+  position: absolute;
+  content: "";
+  font-weight: lighter;
+  border: 2.5px solid white;
+  width: 14px;
+  height: 14px;
 }
 
-span.checkbox.checked::after{
-    background-color: white;
-    box-shadow: inset 0px 0px 0px 3.5px black;
+span.checkbox.checked::after {
+  background-color: white;
+  box-shadow: inset 0px 0px 0px 3.5px black;
 }
-
 
 footer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Courier New', Courier, monospace;
-    font-weight: bold;
-    font-size: 13px;
-    gap: 10px;
-    height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Courier New", Courier, monospace;
+  font-weight: bold;
+  font-size: 13px;
+  gap: 10px;
+  height: auto;
 }
 
 .icons {
-    gap: 8px;
+  gap: 8px;
 }
-  
+
 .icon {
-    font-size: 22px;
-    color: white;
-    transition: .2s;
+  font-size: 22px;
+  color: white;
+  transition: 0.2s;
 }
 
-.fa-brands{
-    transition: .2s;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+.fa-brands {
+  transition: 0.2s;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
-.fa-brands:active{
-    transform: scale(1.2);
+.fa-brands:active {
+  transform: scale(1.2);
 }
 
-.fa-brands::after{
+.fa-brands::after {
+  position: absolute;
+  content: "";
+  z-index: -5;
+  margin: 2px -19px;
+  width: 19px;
+  height: 18px;
+  border-radius: 20px;
+  background-color: black;
+  transition: 0.2s;
+}
+
+.fa-linkedin:active {
+  color: #0e76a8;
+}
+
+.fa-github:active {
+  border-radius: 25px;
+  color: black;
+}
+
+.fa-brands:active::after {
+  background-color: white;
+}
+
+@media screen and (min-width: 992px) {
+  .puntaje-jugando {
+    font-size: 50px;
+    gap: 200px;
+  }
+
+  .game-over {
+    font-size: 30px;
+  }
+
+  .ganador {
+    margin-bottom: 80px;
+    font-size: 50px;
+  }
+
+  .puntaje-final {
+    width: 100%;
+    font-size: 50px;
+  }
+
+  .titulo-ping-pong {
+    font-size: 65px;
+  }
+
+  span.checkbox {
     position: absolute;
-    content: '';
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    margin: 3px 0 0 10px;
+    width: 20px;
+    height: 20px;
+  }
+
+  span.checkbox::after {
+    position: absolute;
+    content: "";
+    font-weight: lighter;
+    border: 3.5px solid white;
+    width: 16px;
+    height: 16px;
+  }
+
+  span.checkbox.checked::after {
+    background-color: white;
+    box-shadow: inset 0px 0px 0px 4px black;
+  }
+
+  .menu {
+    font-size: 32px;
+  }
+
+  .boton {
+    margin: 17px 0;
+  }
+
+  .boton-regresar {
+    margin-top: 60px;
+  }
+
+  .boton:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+  }
+
+  .fa-brands:hover {
+    transform: scale(1.2);
+  }
+
+  .fa-brands::after {
+    position: absolute;
+    content: "";
     z-index: -5;
     margin: 2px -19px;
-    width: 19px;
+    width: 18px;
     height: 18px;
     border-radius: 20px;
     background-color: black;
-    transition: .2s;
-}
+    transition: 0.2s;
+  }
 
-.fa-linkedin:active{
+  .fa-linkedin:hover {
     color: #0e76a8;
-}
+  }
 
-.fa-github:active{
+  .fa-github:hover {
     border-radius: 25px;
     color: black;
-}
+  }
 
-.fa-brands:active::after{
+  .fa-brands:hover::after {
     background-color: white;
-}
-
-
-@media screen and (min-width: 992px) {
-    .puntaje{
-        font-size: 50px;
-        gap: 200px;
-    }
-
-    .game-over{
-        font-size: 30px;
-    }
-
-    .ganador{
-        margin-bottom: 80px;
-        font-size: 50px;
-    }
-    
-    
-    .titulo-ping-pong{
-        font-size: 65px;
-    }
-
-    span.checkbox{
-        position: absolute;
-        color: white;
-        font-size: 17px;
-        font-weight: bold;
-        margin: 3px 0 0 10px;
-        width: 20px;
-        height: 20px;
-    }
-    
-    span.checkbox::after {
-        position: absolute;
-        content: '';
-        font-weight: lighter;
-        border: 3.5px solid white;
-        width: 16px;
-        height: 16px;
-    }
-    
-    span.checkbox.checked::after{
-        background-color: white;
-        box-shadow: inset 0px 0px 0px 4px black;
-    }
-    
-    
-    .menu{
-        font-size: 32px;
-    }
-
-    .boton{
-        margin: 17px 0;
-    }
-
-    .boton-regresar{
-        margin-top: 60px;
-    }
-
-    .boton:hover{
-        cursor: pointer;
-        transform: scale(1.1);
-    }
-
-    .fa-brands:hover{
-        transform: scale(1.2);
-    }
-
-    .fa-brands::after{
-        position: absolute;
-        content: '';
-        z-index: -5;
-        margin: 2px -19px;
-        width: 18px;
-        height: 18px;
-        border-radius: 20px;
-        background-color: black;
-        transition: .2s;
-    }
-
-    .fa-linkedin:hover{
-        color: #0e76a8;
-    }
-
-    .fa-github:hover{
-        border-radius: 25px;
-        color: black;
-    }
-
-    .fa-brands:hover::after{
-        background-color: white;
-    }
-
+  }
 }
