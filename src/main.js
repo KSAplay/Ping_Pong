@@ -3,6 +3,7 @@
 //---------------------------------------------------------------------------
 import * as sonido from "./sistema/sonido.js";
 import * as teclado from "./entradas/teclado.js";
+import * as touch from "./entradas/touch.js";
 import * as render from "./sistema/render.js";
 import { barra1, barra2, pelota } from "./juego/objetos.js";
 import * as barraIA from "./juego/maquina.js";
@@ -29,44 +30,6 @@ var menuActual = document.querySelector(".menu-principal"),
   menuAnterior; // Variables para el botón "Regresar"
 var jugandoSolo = false; // Variables de estado
 
-// Movimiento de las barras mediante toque
-var touches = [];
-window.ontouchstart = (event) => {
-  detectarToque(event);
-};
-
-window.ontouchend = (event) => {
-  detectarToque(event);
-};
-
-function detectarToque(evento) {
-  touches = evento.touches;
-  if (render.estaJugando) {
-    if (touches.length > 0) {
-      for (let i = 0; i < touches.length; i++) {
-        if (touches[i].clientX < render.canvasAncho / 2) {
-          moverBarra1Arriba =
-            touches[i].clientY < render.canvasAlto / 2 ? true : false;
-          moverBarra1Abajo =
-            touches[i].clientY > render.canvasAlto / 2 ? true : false;
-        } else {
-          if (!jugandoSolo) {
-            moverBarra2Arriba =
-              touches[i].clientY < render.canvasAlto / 2 ? true : false;
-            moverBarra2Abajo =
-              touches[i].clientY > render.canvasAlto / 2 ? true : false;
-          }
-        }
-      }
-    } else {
-      moverBarra1Arriba = false;
-      moverBarra1Abajo = false;
-      moverBarra2Arriba = false;
-      moverBarra2Abajo = false;
-    }
-  }
-}
-
 //---------------------------------------------------------------------------
 //                       FUNCIÓN INCIAL DEL JUEGO
 //---------------------------------------------------------------------------
@@ -74,6 +37,7 @@ function gameStart() {
   sonido.init();
   render.init();
   teclado.init();
+  touch.init();
   setValoresIniciales();
   render.limpiar();
   render.renderizar();
@@ -433,7 +397,10 @@ function movimientoGuia() {
     barra2.mover("abajo");
   }
   // Para moviles
-  barra2.mover("touch");
+  if (touch.toques[0].state) {
+    if (touch.toques[0].x < render.canvasAncho / 2) {
+    }
+  }
 
   // Llamamos a otro frame
   guia = window.requestAnimationFrame(movimientoGuia);

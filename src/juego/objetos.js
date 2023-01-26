@@ -1,5 +1,4 @@
 import { canvasAlto, grosorBorde } from "../sistema/render.js";
-import * as touch from "../entradas/touch.js";
 
 class Barra {
   constructor(x, y, largo, ancho, color, velocidad) {
@@ -65,19 +64,6 @@ class Barra {
           this.y = canvasAlto - this.largo / 2 - grosorBorde / 2;
         } else {
           this.y += this.velocidad;
-        }
-        break;
-      case "touch":
-        if (touch.posBarra1Y < barra1.getY() && touch.posBarra1Y != -1) {
-          barra1.moverBarra("arriba");
-        } else {
-          barra1.moverBarra("abajo");
-        }
-
-        if (touch.posBarra2Y < barra2.getY() && touch.posBarra2Y != -1) {
-          barra2.moverBarra("arriba");
-        } else {
-          barra2.moverBarra("abajo");
         }
         break;
     }

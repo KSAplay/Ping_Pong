@@ -1,38 +1,64 @@
 import { barra1, barra2 } from "../juego/objetos.js";
-import { canvasAncho } from "../sistema/render,js";
+import { canvasAncho } from "../sistema/render.js";
 
-// Variables para almacenar la posición inicial del dedo del jugador
-let posBarra1X, posBarra2X;
-let aux;
-export var posBarra1Y = -1,
-  posBarra2Y = -1;
-export var moverBarra = false;
+export const toques = {
+  0: { x: 0, y: 0, state: false },
+  1: { x: 0, y: 0, state: false },
+};
+let toquesActivos = 0;
 
 export function init() {
-  // Asignar eventos touchstart y touchmove al canvas del juego
-  canvas.addEventListener("touchstart", touchStart);
-  canvas.addEventListener("touchmove", touchMove);
+  // Asignamos los eventos touch
+  document.addEventListener("touchstart", touchStart);
+  document.addEventListener("touchmove", touchMove);
+  document.addEventListener("touchend", touchEnd);
+  document.addEventListener("touchcancel", touchCancel);
 }
 
 function touchStart(event) {
-  let posToque = event.touches[0].clientX;
-  if (posToque < canvasAncho / 2) {
-    aux = "barra1";
-    posBarra1X = event.touches[0].clientX;
-    posBarra2X = event.touches[1].clientX;
-  } else {
-    aux = "barra2";
-    posBarra1X = event.touches[1].clientX;
-    posBarra2X = event.touches[0].clientX;
+  for (let i = 0; i < event.touches.length; i++) {
+    if (toquesActivos < 2) {
+      toquesActivos++;
+      toques[event.touches[i].identifier].state = true;
+      toques[event.touches[i].identifier].x = event.touches[i].clientX;
+      toques[event.touches[i].identifier].y = event.touches[i].clientY;
+    }
   }
+  console.log("----------- Touch Start -----------");
+  console.log(toques);
+  console.log(toquesActivos);
 }
 
 function touchMove(event) {
-  if (aux == "barra1") {
-    posBarra1Y = event.touches[0].clientY;
-    posBarra2Y = event.touches[1].clientY;
-  } else {
-    posBarra1Y = event.touches[1].clientY;
-    posBarra2Y = event.touches[0].clientY;
+  for (let i = 0; i < event.touches.length; i++) {
+    if (toques[event.touches[i].identifier].state) {
+      toques[event.touches[i].identifier].x = event.touches[i].clientX;
+      toques[event.touches[i].identifier].y = event.touches[i].clientY;
+    }
   }
+  console.log("----------- Touch Move -----------");
+  console.log(toques);
+  console.log(toquesActivos);
 }
+
+function touchEnd(event) {
+  for (let i = 0; i < event.changedTouches.length; i++) {
+    toques[event.changedTouches[i].identifier].state = false;
+    toquesActivos--;
+  }
+  console.log("----------- Touch End -----------");
+  console.log(toques);
+  console.log(toquesActivos);
+}
+
+function touchCancel(event) {
+  for (let i = 0; i < event.changedTouches.length; i++) {
+    toques[event.changedTouches[i].identifier].state = false;
+    toquesActivos--;
+  }
+  console.log("----------- Touch Cancel -----------");
+  console.log(toques);
+  console.log(toquesActivos);
+}
+
+export function isTouching() {}
