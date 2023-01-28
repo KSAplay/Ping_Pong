@@ -1,10 +1,7 @@
 import { barra1, barra2 } from "../juego/objetos.js";
 import { canvasAncho } from "../sistema/render.js";
 
-export const toques = {
-  0: { x: 0, y: 0, state: false },
-  1: { x: 0, y: 0, state: false },
-};
+export const toques = {};
 let toquesActivos = 0;
 
 export function init() {
@@ -12,53 +9,95 @@ export function init() {
   document.addEventListener("touchstart", touchStart);
   document.addEventListener("touchmove", touchMove);
   document.addEventListener("touchend", touchEnd);
-  document.addEventListener("touchcancel", touchCancel);
 }
 
 function touchStart(event) {
   for (let i = 0; i < event.touches.length; i++) {
-    if (toquesActivos < 2) {
-      toquesActivos++;
-      toques[event.touches[i].identifier].state = true;
-      toques[event.touches[i].identifier].x = event.touches[i].clientX;
-      toques[event.touches[i].identifier].y = event.touches[i].clientY;
+    const id = event.touches[i].identifier;
+    toques[id] = {
+      x: event.touches[i].clientX,
+      y: event.touches[i].clientY,
+      estaTocando: true,
+      barraSeleccionada: "ninguno",
+    };
+    if (toques[id].x < canvasAncho / 2) {
+      toques[id].barraSeleccionada = "barra1";
+    }
+
+    if (toques[id].x > canvasAncho / 2) {
+      toques[id].barraSeleccionada = "barra2";
     }
   }
-  console.log("----------- Touch Start -----------");
-  console.log(toques);
-  console.log(toquesActivos);
 }
 
 function touchMove(event) {
   for (let i = 0; i < event.touches.length; i++) {
-    if (toques[event.touches[i].identifier].state) {
-      toques[event.touches[i].identifier].x = event.touches[i].clientX;
-      toques[event.touches[i].identifier].y = event.touches[i].clientY;
+    const id = event.touches[i].identifier;
+    if (toques[id].estaTocando) {
+      toques[id].y = event.touches[i].clientY;
     }
   }
-  console.log("----------- Touch Move -----------");
-  console.log(toques);
-  console.log(toquesActivos);
 }
 
 function touchEnd(event) {
   for (let i = 0; i < event.changedTouches.length; i++) {
-    toques[event.changedTouches[i].identifier].state = false;
-    toquesActivos--;
+    const id = event.changedTouches[i].identifier;
+    toques[id].estaTocando = false;
+    toques[id].barraSeleccionada = "ninguno";
+    // delete toques[id];
   }
-  console.log("----------- Touch End -----------");
-  console.log(toques);
-  console.log(toquesActivos);
 }
 
-function touchCancel(event) {
-  for (let i = 0; i < event.changedTouches.length; i++) {
-    toques[event.changedTouches[i].identifier].state = false;
-    toquesActivos--;
+export function estaTocandoIzquierda() {
+  let aux = false;
+  if (Object.keys(toques).length > 0) {
+    for (let i = 0; i < Object.keys(toques).length; i++) {
+      if (toques[i].barraSeleccionada === "barra1" && toques[i].estaTocando) {
+        aux = true;
+      }
+    }
   }
-  console.log("----------- Touch Cancel -----------");
-  console.log(toques);
-  console.log(toquesActivos);
+  return aux;
 }
 
-export function isTouching() {}
+export function estaTocandoDerecha() {
+  let aux = false;
+  if (Object.keys(toques).length > 0) {
+    for (let i = 0; i < Object.keys(toques).length; i++) {
+      if (toques[i].barraSeleccionada === "barra2" && toques[i].estaTocando) {
+        aux = true;
+      }
+    }
+  }
+  return aux;
+}
+
+export function estaTocandoSobre(barraObjeto, barraNombre) {
+  let aux = false;
+  if (Object.keys(toques).length > 0) {
+    for (let i = 0; i < Object.keys(toques).length; i++) {
+      if (
+        toques[i].barraSeleccionada === barraNombre &&
+        toques[i].y < barraObjeto.getY() - barraObjeto.getVelocidad()
+      ) {
+        aux = true;
+      }
+    }
+  }
+  return aux;
+}
+
+export function estaTocandoDebajo(barraObjeto, barraNombre) {
+  let aux = false;
+  if (Object.keys(toques).length > 0) {
+    for (let i = 0; i < Object.keys(toques).length; i++) {
+      if (
+        toques[i].barraSeleccionada === barraNombre &&
+        toques[i].y > barraObjeto.getY() + barraObjeto.getVelocidad()
+      ) {
+        aux = true;
+      }
+    }
+  }
+  return aux;
+}

@@ -74,7 +74,13 @@ function gameLoop(time) {
     barra1.mover("abajo");
   }
   // Móvil o Tablet
-
+  if (touch.estaTocandoIzquierda()) {
+    if (touch.estaTocandoSobre(barra1, "barra1")) {
+      barra1.mover("arriba");
+    } else if (touch.estaTocandoDebajo(barra1, "barra1")) {
+      barra1.mover("abajo");
+    }
+  }
   // ---------- Movimieto de la Barra 2 ----------
   if (jugandoSolo) {
     barraIA.moverBarra2();
@@ -86,6 +92,13 @@ function gameLoop(time) {
       barra2.mover("abajo");
     }
     // Móvil o Tablet
+    if (touch.estaTocandoDerecha()) {
+      if (touch.estaTocandoSobre(barra2, "barra2")) {
+        barra2.mover("arriba");
+      } else if (touch.estaTocandoDebajo(barra2, "barra2")) {
+        barra2.mover("abajo");
+      }
+    }
   }
 
   // ----- Detecta la pelota en los bordes -----
@@ -397,11 +410,20 @@ function movimientoGuia() {
     barra2.mover("abajo");
   }
   // Para moviles
-  if (touch.toques[0].state) {
-    if (touch.toques[0].x < render.canvasAncho / 2) {
+  if (touch.estaTocandoIzquierda()) {
+    if (touch.estaTocandoSobre(barra1, "barra1")) {
+      barra1.mover("arriba");
+    } else if (touch.estaTocandoDebajo(barra1, "barra1")) {
+      barra1.mover("abajo");
     }
   }
-
+  if (touch.estaTocandoDerecha()) {
+    if (touch.estaTocandoSobre(barra2, "barra2")) {
+      barra2.mover("arriba");
+    } else if (touch.estaTocandoDebajo(barra2, "barra2")) {
+      barra2.mover("abajo");
+    }
+  }
   // Llamamos a otro frame
   guia = window.requestAnimationFrame(movimientoGuia);
 }
